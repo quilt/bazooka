@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 )
 
-func makeP2PServer(bc *core.BlockChain) *p2p.Server {
+func makeP2PServer(sp *SimulationProtocol) *p2p.Server {
 	serverKey, err := crypto.GenerateKey()
 	if err != nil {
 		panic(fmt.Sprintf("Failed to generate server key: %v", err))
@@ -28,7 +27,7 @@ func makeP2PServer(bc *core.BlockChain) *p2p.Server {
 				Version: 64,
 				Length:  17,
 				Run: func(peer *p2p.Peer, rw p2p.MsgReadWriter) error {
-					return runProtocol(bc, peer, rw)
+					return runProtocol(sp, peer, rw)
 				},
 			},
 		},

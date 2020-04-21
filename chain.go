@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
@@ -13,6 +14,8 @@ import (
 )
 
 func initBlockchain(db ethdb.Database) (*core.BlockChain, error) {
+	n := 10
+
 	genesis, err := genesis()
 	if err != nil {
 		panic(fmt.Errorf("Could not create genesis: %s", err))
@@ -21,8 +24,9 @@ func initBlockchain(db ethdb.Database) (*core.BlockChain, error) {
 
 	engine := ethash.NewFaker()
 	blockchain, _ := core.NewBlockChain(db, nil, params.AllEthashProtocolChanges, engine, vm.Config{}, nil)
-	blocks, _ := core.GenerateChain(params.TestChainConfig, genesisBlock, engine, db, 1, func(i int, b *core.BlockGen) {
-		b.SetCoinbase(common.Address{0: byte(1), 19: byte(i)})
+	blocks, _ := core.GenerateChain(params.TestChainConfig, genesisBlock, engine, db, n, func(i int, b *core.BlockGen) {
+		b.SetCoinbase(common.BigToAddress(big.NewInt(1337)))
+		b.SetExtra(common.BigToHash(big.NewInt(42)).Bytes())
 	})
 	_, _ = blockchain.InsertChain(blocks)
 

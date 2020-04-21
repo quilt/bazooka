@@ -10,12 +10,16 @@ import (
 func main() {
 	setupLogger()
 
-	blockchain, err := initBlockchain(rawdb.NewMemoryDatabase())
+	db := rawdb.NewMemoryDatabase()
+
+	blockchain, err := initBlockchain(db)
 	if err != nil {
 		panic(fmt.Errorf("Error initializing chain: %s", err))
 	}
 
-	server := makeP2PServer(blockchain)
+	pw := NewProtocolManager(blockchain)
+
+	server := makeP2PServer(pw)
 	err = server.Start()
 	if err != nil {
 		panic("Error starting server")
