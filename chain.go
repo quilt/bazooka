@@ -20,6 +20,7 @@ func initBlockchain(db ethdb.Database) (*core.BlockChain, error) {
 	if err != nil {
 		panic(fmt.Errorf("Could not create genesis: %s", err))
 	}
+
 	genesisBlock := genesis.MustCommit(db)
 
 	engine := ethash.NewFaker()
