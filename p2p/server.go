@@ -1,8 +1,9 @@
-package main
+package p2p
 
 import (
 	"fmt"
 	"io/ioutil"
+	"main/eth"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
@@ -10,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 )
 
-func makeP2PServer(sp *SimulationProtocol) *p2p.Server {
+func MakeP2PServer(sp *eth.SimulationProtocol) *p2p.Server {
 	serverKey, err := crypto.GenerateKey()
 	if err != nil {
 		panic(fmt.Sprintf("Failed to generate server key: %v", err))
@@ -27,7 +28,7 @@ func makeP2PServer(sp *SimulationProtocol) *p2p.Server {
 				Version: 64,
 				Length:  17,
 				Run: func(peer *p2p.Peer, rw p2p.MsgReadWriter) error {
-					return runProtocol(sp, peer, rw)
+					return eth.RunProtocol(sp, peer, rw)
 				},
 			},
 		},
@@ -36,8 +37,8 @@ func makeP2PServer(sp *SimulationProtocol) *p2p.Server {
 	return &p2p.Server{Config: p2pConfig}
 }
 
-func addLocalPeer(server *p2p.Server) error {
-	node, err := getTargetAddr()
+func AddLocalPeer(server *p2p.Server) error {
+	node, err := GetTargetAddr()
 	if err != nil {
 		return err
 	}
@@ -47,7 +48,7 @@ func addLocalPeer(server *p2p.Server) error {
 	return nil
 }
 
-func getTargetAddr() (*enode.Node, error) {
+func GetTargetAddr() (*enode.Node, error) {
 	nodeKeyHex, err := ioutil.ReadFile("/home/matt/eth/aasim/geth/nodekey")
 	if err != nil {
 		return nil, err

@@ -1,4 +1,4 @@
-package main
+package payload
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 )
 
-func initBlockchain(db ethdb.Database) (*core.BlockChain, error) {
+func InitBlockchain(db ethdb.Database) (*core.BlockChain, error) {
 	n := 10
 
 	genesis, err := genesis()

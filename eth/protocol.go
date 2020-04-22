@@ -1,4 +1,4 @@
-package main
+package eth
 
 import (
 	"fmt"
@@ -38,7 +38,7 @@ func (sp *SimulationProtocol) markBlockSent(blockNumber uint) bool {
 	return result
 }
 
-func runProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) error {
+func RunProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) error {
 	err := syncHandshake(sp.chain, rw)
 	if err != nil {
 		return fmt.Errorf("Handshake failed: %s", err)
@@ -47,6 +47,10 @@ func runProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) e
 	syncComplete := false
 
 	for {
+		if syncComplete {
+			break
+		}
+
 		msg, err := rw.ReadMsg()
 		if err != nil {
 			return fmt.Errorf("failed to receive message from peer: %w", err)
@@ -67,11 +71,6 @@ func runProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) e
 			}
 		default:
 			log.Trace("Unrecognized message", "msg", msg)
-		}
-
-		// break after sync is complete
-		if syncComplete {
-			break
 		}
 	}
 

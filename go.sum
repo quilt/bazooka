@@ -88,6 +88,7 @@ github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORN
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
+github.com/lightclient/bazooka v0.0.0-20200422225149-35a8b7fb26f1 h1:lrR7K1af6OaguGDNzIc9z3gqUj7UPQDE8YVrEYQf6Wo=
 github.com/lightclient/go-ethereum v1.9.12 h1:JMnldEpmHPcTB07OcyfRLpylRFLYkyivg4gQ8XTeqGs=
 github.com/lightclient/go-ethereum v1.9.12/go.mod h1:PvsVkQmhZFx92Y+h2ylythYlheEDt/uBgFbl61Js/jo=
 github.com/lightclient/go-ethereum v1.9.13-0.20200417125138-ca22d0761bd7 h1:FTuEfiJGs5Jlrfd3GOs7jJ4NPjEpPwMFH4JMRLptepw=
