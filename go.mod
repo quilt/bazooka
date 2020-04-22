@@ -1,4 +1,4 @@
-module main
+module github.com/lightclient/bazooka
 
 go 1.13
 

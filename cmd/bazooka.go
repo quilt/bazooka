@@ -8,35 +8,40 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/lightclient/bazooka/eth"
+	"github.com/lightclient/bazooka/p2p"
+	"github.com/lightclient/bazooka/payload"
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
 )
 
-func Execute() {
+func Execute() error {
 	setupLogger()
 
 	db := rawdb.NewMemoryDatabase()
 
-	blockchain, err := payload.initBlockchain(db)
+	blockchain, err := payload.InitBlockchain(db)
 	if err != nil {
 		panic(fmt.Errorf("Error initializing chain: %s", err))
 	}
 
-	pw := NewProtocolManager(blockchain)
+	pw := eth.NewProtocolManager(blockchain)
 
-	server := makeP2PServer(pw)
+	server := p2p.MakeP2PServer(pw)
 	err = server.Start()
 	if err != nil {
 		panic("Error starting server")
 	}
 
-	err = addLocalPeer(server)
+	err = p2p.AddLocalPeer(server)
 	if err != nil {
 		panic(fmt.Errorf("Error adding local peer: %s", err))
 	}
 
 	time.Sleep(30 * time.Second)
 	server.Stop()
+
+	return nil
 }
 
 func setupLogger() {

@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/lighclient/bazooka/cmd"
+	"github.com/lightclient/bazooka/cmd"
 )
 
 func main() {

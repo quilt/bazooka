@@ -3,12 +3,12 @@ package p2p
 import (
 	"fmt"
 	"io/ioutil"
-	"main/eth"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/lightclient/bazooka/eth"
 )
 
 func MakeP2PServer(sp *eth.SimulationProtocol) *p2p.Server {
