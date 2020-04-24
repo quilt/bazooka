@@ -1,6 +1,8 @@
 package attack
 
-import "github.com/lightclient/bazooka/routine"
+import (
+	"github.com/lightclient/bazooka/routine"
+)
 
 type Runner struct {
 	routines []routine.Routine

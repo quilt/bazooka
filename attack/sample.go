@@ -7,7 +7,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/lightclient/bazooka/handler"
 	"github.com/lightclient/bazooka/routine"
 )
 
@@ -19,13 +18,8 @@ func NewSampleAttack(c chan routine.Routine) (*Runner, error) {
 		return nil, err
 	}
 
-	genesis, err := handler.Genesis()
-	if err != nil {
-		return nil, err
-	}
-
 	tx := types.NewTransaction(0, common.BigToAddress(big.NewInt(0)), big.NewInt(100), params.TxGas, big.NewInt(10), nil)
-	signer := types.MakeSigner(genesis.Config, big.NewInt(0))
+	signer := types.NewEIP155Signer(big.NewInt(1337))
 	signedTx, err1 := types.SignTx(tx, signer, coinbaseKey)
 	if err1 != nil {
 		panic(err1)

@@ -9,8 +9,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/lightclient/bazooka/attack"
-	"github.com/lightclient/bazooka/handler"
-	"github.com/lightclient/bazooka/p2p"
+	"github.com/lightclient/bazooka/protocol"
+	"github.com/lightclient/bazooka/simulator"
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
 )
@@ -20,33 +20,23 @@ func Execute() error {
 
 	db := rawdb.NewMemoryDatabase()
 
-	blockchain, err := handler.InitBlockchain(db)
+	blockchain, err := protocol.InitBlockchain(db)
 	if err != nil {
 		panic(fmt.Errorf("Error initializing chain: %s", err))
 	}
 
-	pw := handler.NewProtocolManager(blockchain)
+	sm := simulator.NewManager(blockchain, 1)
 
-	runner, err := attack.NewSampleAttack(pw.Routines)
+	runner, err := attack.NewSampleAttack(sm.GetRoutinesChannel(0))
 	if err != nil {
 		panic(fmt.Errorf("Error initializing attack: %s", err))
 	}
 
-	server := p2p.MakeP2PServer(pw)
-	err = server.Start()
-	if err != nil {
-		panic("Error starting server")
-	}
-
 	runner.Run()
 
-	err = p2p.AddLocalPeer(server)
-	if err != nil {
-		panic(fmt.Errorf("Error adding local peer: %s", err))
-	}
-
+	sm.StartServers()
 	time.Sleep(30 * time.Second)
-	server.Stop()
+	sm.StopServers()
 
 	return nil
 }

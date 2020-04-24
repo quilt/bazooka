@@ -8,10 +8,10 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/lightclient/bazooka/handler"
+	"github.com/lightclient/bazooka/protocol"
 )
 
-func MakeP2PServer(sp *handler.SimulationProtocol) *p2p.Server {
+func MakeP2PServer(pm *protocol.Manager) *p2p.Server {
 	serverKey, err := crypto.GenerateKey()
 	if err != nil {
 		panic(fmt.Sprintf("Failed to generate server key: %v", err))
@@ -28,7 +28,7 @@ func MakeP2PServer(sp *handler.SimulationProtocol) *p2p.Server {
 				Version: 64,
 				Length:  17,
 				Run: func(peer *p2p.Peer, rw p2p.MsgReadWriter) error {
-					return handler.RunProtocol(sp, peer, rw)
+					return protocol.RunProtocol(pm, peer, rw)
 				},
 			},
 		},

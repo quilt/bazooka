@@ -1,12 +1,10 @@
-package handler
+package protocol
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/forkid"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/log"
@@ -15,32 +13,8 @@ import (
 	"github.com/lightclient/bazooka/routine"
 )
 
-type SimulationProtocol struct {
-	chain        *core.BlockChain
-	blockMarkers []uint64
-	Routines     chan routine.Routine
-}
-
-func NewProtocolManager(bc *core.BlockChain) *SimulationProtocol {
-	return &SimulationProtocol{chain: bc, Routines: make(chan routine.Routine, 10)}
-}
-
-func (sp *SimulationProtocol) markBlockSent(blockNumber uint) bool {
-	lengthNeeded := (blockNumber+63)/64 + 1
-
-	if lengthNeeded > uint(len(sp.blockMarkers)) {
-		sp.blockMarkers = append(sp.blockMarkers, make([]uint64, lengthNeeded-uint(len(sp.blockMarkers)))...)
-	}
-
-	bitMask := (uint64(1) << (blockNumber & 63))
-	result := (sp.blockMarkers[blockNumber/64] & bitMask) != 0
-	sp.blockMarkers[blockNumber/64] |= bitMask
-
-	return result
-}
-
-func RunProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) error {
-	err := syncHandshake(sp.chain, rw)
+func RunProtocol(pm *Manager, peer *p2p.Peer, rw p2p.MsgReadWriter) error {
+	err := syncHandshake(pm.chain, rw)
 	if err != nil {
 		return fmt.Errorf("Handshake failed: %s", err)
 	}
@@ -49,8 +23,8 @@ func RunProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) e
 
 	for {
 		if syncComplete {
-			r := <-sp.Routines
-			exit, err := sp.handleRoutine(r, rw)
+			r := <-pm.Routines
+			exit, err := pm.handleRoutine(r, rw)
 			if err != nil {
 				return err
 			}
@@ -66,15 +40,15 @@ func RunProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) e
 
 		switch {
 		case msg.Code == eth.GetBlockHeadersMsg:
-			if err = sp.handleGetBlockHeaderMsg(msg, rw); err != nil {
+			if err = pm.handleGetBlockHeaderMsg(msg, rw); err != nil {
 				return err
 			}
 		case msg.Code == eth.GetBlockBodiesMsg:
-			if err = sp.handleGetBlockBodiesMsg(msg, rw); err != nil {
+			if err = pm.handleGetBlockBodiesMsg(msg, rw); err != nil {
 				return err
 			}
 		case msg.Code == eth.NewBlockHashesMsg:
-			if syncComplete, err = sp.handleNewBlockHashesMsg(msg, rw); err != nil {
+			if syncComplete, err = pm.handleNewBlockHashesMsg(msg, rw); err != nil {
 				return err
 			}
 		default:
@@ -85,27 +59,7 @@ func RunProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) e
 	return nil
 }
 
-func syncHandshake(bc *core.BlockChain, rw p2p.MsgReadWriter) error {
-	status := eth.StatusData{
-		ProtocolVersion: 64,
-		NetworkID:       1337,
-		TD:              bc.CurrentBlock().Difficulty(),
-		Head:            bc.CurrentHeader().Hash(),
-		Genesis:         bc.Genesis().Hash(),
-		ForkID:          forkid.NewID(bc),
-	}
-
-	log.Debug(fmt.Sprintf("%#v,", status))
-
-	err := p2p.Send(rw, 0x00, status)
-	if err != nil {
-		return fmt.Errorf("failed to send status message to peer: %w", err)
-	}
-
-	return nil
-}
-
-func (sp *SimulationProtocol) handleGetBlockHeaderMsg(msg p2p.Msg, rw p2p.MsgReadWriter) error {
+func (pm *Manager) handleGetBlockHeaderMsg(msg p2p.Msg, rw p2p.MsgReadWriter) error {
 	var query eth.GetBlockHeadersData
 	if err := msg.Decode(&query); err != nil {
 		return fmt.Errorf("failed to decode msg %v: %w", msg, err)
@@ -121,7 +75,7 @@ func (sp *SimulationProtocol) handleGetBlockHeaderMsg(msg p2p.Msg, rw p2p.MsgRea
 
 	// if selecting via hash, convert to number
 	if query.Origin.Hash != (common.Hash{}) {
-		header := sp.chain.GetHeaderByHash(query.Origin.Hash)
+		header := pm.chain.GetHeaderByHash(query.Origin.Hash)
 		if header != nil {
 			query.Origin.Hash = common.Hash{}
 			query.Origin.Number = header.Number.Uint64()
@@ -133,7 +87,7 @@ func (sp *SimulationProtocol) handleGetBlockHeaderMsg(msg p2p.Msg, rw p2p.MsgRea
 	// find hashes via number
 	number := query.Origin.Number
 	for i := 0; i < int(query.Amount); i++ {
-		if header := sp.chain.GetHeaderByNumber(number); header != nil {
+		if header := pm.chain.GetHeaderByNumber(number); header != nil {
 			headers = append(headers, header)
 		}
 		number += query.Skip + 1
@@ -146,7 +100,7 @@ func (sp *SimulationProtocol) handleGetBlockHeaderMsg(msg p2p.Msg, rw p2p.MsgRea
 	return nil
 }
 
-func (sp *SimulationProtocol) handleGetBlockBodiesMsg(msg p2p.Msg, rw p2p.MsgReadWriter) error {
+func (pm *Manager) handleGetBlockBodiesMsg(msg p2p.Msg, rw p2p.MsgReadWriter) error {
 	log.Trace("GetBlockBodiesMsg")
 
 	msgStream := rlp.NewStream(msg.Payload, uint64(msg.Size))
@@ -167,7 +121,7 @@ func (sp *SimulationProtocol) handleGetBlockBodiesMsg(msg p2p.Msg, rw p2p.MsgRea
 			return fmt.Errorf("msg %v: %v", msg, err)
 		}
 
-		if data := sp.chain.GetBodyRLP(hash); len(data) != 0 {
+		if data := pm.chain.GetBodyRLP(hash); len(data) != 0 {
 			bodies = append(bodies, data)
 			bytes += len(data)
 		}
@@ -180,7 +134,7 @@ func (sp *SimulationProtocol) handleGetBlockBodiesMsg(msg p2p.Msg, rw p2p.MsgRea
 	return nil
 }
 
-func (sp *SimulationProtocol) handleNewBlockHashesMsg(msg p2p.Msg, rw p2p.MsgReadWriter) (bool, error) {
+func (pm *Manager) handleNewBlockHashesMsg(msg p2p.Msg, rw p2p.MsgReadWriter) (bool, error) {
 	var blockHashMsg eth.NewBlockHashesData
 	if err := msg.Decode(&blockHashMsg); err != nil {
 		return false, fmt.Errorf("failed to decode msg %v: %w", msg, err)
@@ -190,7 +144,7 @@ func (sp *SimulationProtocol) handleNewBlockHashesMsg(msg p2p.Msg, rw p2p.MsgRea
 
 	syncComplete := false
 	for _, bh := range blockHashMsg {
-		if bh.Number == sp.chain.CurrentBlock().NumberU64() {
+		if bh.Number == pm.chain.CurrentBlock().NumberU64() {
 			syncComplete = true
 			break
 		}
@@ -198,7 +152,9 @@ func (sp *SimulationProtocol) handleNewBlockHashesMsg(msg p2p.Msg, rw p2p.MsgRea
 	return syncComplete, nil
 }
 
-func (sp *SimulationProtocol) handleRoutine(r routine.Routine, rw p2p.MsgReadWriter) (bool, error) {
+func (pm *Manager) handleRoutine(r routine.Routine, rw p2p.MsgReadWriter) (bool, error) {
+	log.Info(fmt.Sprintf("Handling routine: %d", r.Ty))
+
 	switch r.Ty {
 	case routine.SendBlock:
 		return false, p2p.Send(rw, eth.NewBlockMsg, r.Block)
