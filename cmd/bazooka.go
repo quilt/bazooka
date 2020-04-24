@@ -8,6 +8,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/lightclient/bazooka/attack"
 	"github.com/lightclient/bazooka/handler"
 	"github.com/lightclient/bazooka/p2p"
 	"github.com/mattn/go-colorable"
@@ -26,11 +27,18 @@ func Execute() error {
 
 	pw := handler.NewProtocolManager(blockchain)
 
+	runner, err := attack.NewSampleAttack(pw.Routines)
+	if err != nil {
+		panic(fmt.Errorf("Error initializing attack: %s", err))
+	}
+
 	server := p2p.MakeP2PServer(pw)
 	err = server.Start()
 	if err != nil {
 		panic("Error starting server")
 	}
+
+	runner.Run()
 
 	err = p2p.AddLocalPeer(server)
 	if err != nil {

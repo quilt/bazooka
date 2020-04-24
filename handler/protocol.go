@@ -18,11 +18,11 @@ import (
 type SimulationProtocol struct {
 	chain        *core.BlockChain
 	blockMarkers []uint64
-	routines     chan routine.Routine
+	Routines     chan routine.Routine
 }
 
 func NewProtocolManager(bc *core.BlockChain) *SimulationProtocol {
-	return &SimulationProtocol{chain: bc, routines: make(chan routine.Routine, 10)}
+	return &SimulationProtocol{chain: bc, Routines: make(chan routine.Routine, 10)}
 }
 
 func (sp *SimulationProtocol) markBlockSent(blockNumber uint) bool {
@@ -49,7 +49,7 @@ func RunProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) e
 
 	for {
 		if syncComplete {
-			r := <-sp.routines
+			r := <-sp.Routines
 			exit, err := sp.handleRoutine(r, rw)
 			if err != nil {
 				return err
