@@ -9,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/lightclient/bazooka/attack"
-	"github.com/lightclient/bazooka/protocol"
 	"github.com/lightclient/bazooka/simulator"
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
@@ -20,7 +19,7 @@ func Execute() error {
 
 	db := rawdb.NewMemoryDatabase()
 
-	blockchain, err := protocol.InitBlockchain(db)
+	blockchain, err := simulator.InitBlockchain(db)
 	if err != nil {
 		panic(fmt.Errorf("Error initializing chain: %s", err))
 	}

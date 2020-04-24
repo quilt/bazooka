@@ -1,4 +1,4 @@
-package protocol
+package simulator
 
 import (
 	"fmt"
