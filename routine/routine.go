@@ -1,4 +1,4 @@
-package payload
+package routine
 
 import (
 	"time"
@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	SendTxsRoutine = iota
-	SendBlockRoutine
-	SleepRoutine
+	SendTxs = iota
+	SendBlock
+	Sleep
 	Exit
 )
 

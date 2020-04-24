@@ -12,17 +12,17 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/lightclient/bazooka/payload"
+	"github.com/lightclient/bazooka/routine"
 )
 
 type SimulationProtocol struct {
 	chain        *core.BlockChain
 	blockMarkers []uint64
-	routines     chan payload.Routine
+	routines     chan routine.Routine
 }
 
 func NewProtocolManager(bc *core.BlockChain) *SimulationProtocol {
-	return &SimulationProtocol{chain: bc, routines: make(chan payload.Routine, 10)}
+	return &SimulationProtocol{chain: bc, routines: make(chan routine.Routine, 10)}
 }
 
 func (sp *SimulationProtocol) markBlockSent(blockNumber uint) bool {
@@ -198,16 +198,16 @@ func (sp *SimulationProtocol) handleNewBlockHashesMsg(msg p2p.Msg, rw p2p.MsgRea
 	return syncComplete, nil
 }
 
-func (sp *SimulationProtocol) handleRoutine(r payload.Routine, rw p2p.MsgReadWriter) (bool, error) {
+func (sp *SimulationProtocol) handleRoutine(r routine.Routine, rw p2p.MsgReadWriter) (bool, error) {
 	switch r.Ty {
-	case payload.SendTxsRoutine:
-		return false, p2p.Send(rw, eth.TransactionMsg, r.Transactions)
-	case payload.SendBlockRoutine:
+	case routine.SendBlock:
 		return false, p2p.Send(rw, eth.NewBlockMsg, r.Block)
-	case payload.SleepRoutine:
+	case routine.SendTxs:
+		return false, p2p.Send(rw, eth.TransactionMsg, r.Transactions)
+	case routine.Sleep:
 		time.Sleep(r.SleepDuration)
 		return false, nil
-	case payload.Exit:
+	case routine.Exit:
 		return true, nil
 	default:
 		return false, fmt.Errorf("Unrecognized routine type")

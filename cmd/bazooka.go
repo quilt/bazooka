@@ -10,7 +10,6 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/lightclient/bazooka/handler"
 	"github.com/lightclient/bazooka/p2p"
-	"github.com/lightclient/bazooka/payload"
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
 )
@@ -20,7 +19,7 @@ func Execute() error {
 
 	db := rawdb.NewMemoryDatabase()
 
-	blockchain, err := payload.InitBlockchain(db)
+	blockchain, err := handler.InitBlockchain(db)
 	if err != nil {
 		panic(fmt.Errorf("Error initializing chain: %s", err))
 	}

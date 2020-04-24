@@ -1,4 +1,4 @@
-package payload
+package handler
 
 import (
 	"fmt"
