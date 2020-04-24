@@ -1,8 +1,7 @@
-package eth
+package handler
 
 import (
 	"fmt"
-	"math/big"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -13,15 +12,17 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/lightclient/bazooka/payload"
 )
 
 type SimulationProtocol struct {
 	chain        *core.BlockChain
 	blockMarkers []uint64
+	routines     chan payload.Routine
 }
 
 func NewProtocolManager(bc *core.BlockChain) *SimulationProtocol {
-	return &SimulationProtocol{chain: bc}
+	return &SimulationProtocol{chain: bc, routines: make(chan payload.Routine, 10)}
 }
 
 func (sp *SimulationProtocol) markBlockSent(blockNumber uint) bool {
@@ -48,7 +49,14 @@ func RunProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) e
 
 	for {
 		if syncComplete {
-			break
+			r := <-sp.routines
+			exit, err := sp.handleRoutine(r, rw)
+			if err != nil {
+				return err
+			}
+			if exit != false {
+				break
+			}
 		}
 
 		msg, err := rw.ReadMsg()
@@ -72,13 +80,6 @@ func RunProtocol(sp *SimulationProtocol, peer *p2p.Peer, rw p2p.MsgReadWriter) e
 		default:
 			log.Trace("Unrecognized message", "msg", msg)
 		}
-	}
-
-	// send invalid tx
-	time.Sleep(1 * time.Second)
-	log.Info("Sending TransactionMsg now")
-	if err := p2p.Send(rw, eth.TransactionMsg, []types.Transaction{*types.NewTransaction(0, common.BigToAddress(big.NewInt(42)), big.NewInt(1337), 1000000, big.NewInt(12), []byte{0})}); err != nil {
-		return fmt.Errorf("couldn't announce new txs")
 	}
 
 	return nil
@@ -195,4 +196,20 @@ func (sp *SimulationProtocol) handleNewBlockHashesMsg(msg p2p.Msg, rw p2p.MsgRea
 		}
 	}
 	return syncComplete, nil
+}
+
+func (sp *SimulationProtocol) handleRoutine(r payload.Routine, rw p2p.MsgReadWriter) (bool, error) {
+	switch r.Ty {
+	case payload.SendTxsRoutine:
+		return false, p2p.Send(rw, eth.TransactionMsg, r.Transactions)
+	case payload.SendBlockRoutine:
+		return false, p2p.Send(rw, eth.NewBlockMsg, r.Block)
+	case payload.SleepRoutine:
+		time.Sleep(r.SleepDuration)
+		return false, nil
+	case payload.Exit:
+		return true, nil
+	default:
+		return false, fmt.Errorf("Unrecognized routine type")
+	}
 }

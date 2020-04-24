@@ -8,14 +8,15 @@ import (
 
 const (
 	SendTxsRoutine = iota
-	SendBlocksRoutine
+	SendBlockRoutine
 	SleepRoutine
+	Exit
 )
 
 type Routine struct {
-	ty            int
-	from          int
-	transactions  []types.Transaction
-	blocks        []types.Block
-	sleepDuration time.Duration
+	Ty            int
+	From          int
+	Transactions  []types.Transaction
+	Block         types.Block
+	SleepDuration time.Duration
 }

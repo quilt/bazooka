@@ -8,7 +8,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/lightclient/bazooka/eth"
+	"github.com/lightclient/bazooka/handler"
 	"github.com/lightclient/bazooka/p2p"
 	"github.com/lightclient/bazooka/payload"
 	"github.com/mattn/go-colorable"
@@ -25,7 +25,7 @@ func Execute() error {
 		panic(fmt.Errorf("Error initializing chain: %s", err))
 	}
 
-	pw := eth.NewProtocolManager(blockchain)
+	pw := handler.NewProtocolManager(blockchain)
 
 	server := p2p.MakeP2PServer(pw)
 	err = server.Start()
