@@ -9,7 +9,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "bazooka",
-	Short: "Bazooka is a peer simulator for eth1 clients",
+	Short: "Bazooka is an attack orchestration tool targeting Ethereum clients.",
 }
 
 func init() {
