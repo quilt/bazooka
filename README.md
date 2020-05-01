@@ -1,6 +1,6 @@
-[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue)](https://github.com/lightclient/fast-evm)
-
 # bazooka
+
+[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue)](https://github.com/lightclient/fast-evm)
 
 An attack orchestration tool targeting Ethereum clients.
 
