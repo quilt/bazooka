@@ -5,16 +5,21 @@ import (
 	"io/ioutil"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/lightclient/bazooka/attack"
+	"github.com/lightclient/bazooka/simulator/contracts"
 )
 
-func InitBlockchain(db ethdb.Database) (*core.BlockChain, error) {
+func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Account) (*core.BlockChain, error) {
 	n := 10
 
 	genesis, err := Genesis()
@@ -26,15 +31,63 @@ func InitBlockchain(db ethdb.Database) (*core.BlockChain, error) {
 	if err != nil {
 		return nil, err
 	}
-	coinbase := crypto.PubkeyToAddress(coinbaseKey.PublicKey)
+
+	txOpts := bind.NewKeyedTransactor(coinbaseKey)
+	txOpts.GasPrice = big.NewInt(1)
+	txOpts.GasLimit = 20 * params.TxGas
+	txOpts.Nonce = big.NewInt(0)
+	var nonce int64 = -1
+
+	backend := &NoopBackend{db: db, genesis: genesis}
+
+	var deployer *contracts.Deployer
+	var deployerAddress common.Address
+	var deploy = func(code []byte, salt []byte) *types.Transaction {
+		var fixedSalt [32]byte
+		copy(fixedSalt[:], salt[:])
+
+		nonce++
+		txOpts.Nonce.SetInt64(nonce)
+		tx, err := deployer.Deploy(txOpts, code, fixedSalt)
+		if err != nil {
+			panic(err)
+		}
+		return tx
+	}
 
 	genesisBlock := genesis.MustCommit(db)
 
 	engine := ethash.NewFaker()
 	blockchain, _ := core.NewBlockChain(db, nil, params.AllEthashProtocolChanges, engine, vm.Config{}, nil)
 	blocks, _ := core.GenerateChain(params.TestChainConfig, genesisBlock, engine, db, n, func(i int, b *core.BlockGen) {
-		b.SetCoinbase(coinbase)
+		b.SetCoinbase(crypto.PubkeyToAddress(coinbaseKey.PublicKey))
 		b.SetExtra(common.BigToHash(big.NewInt(42)).Bytes())
+
+		var tx *types.Transaction
+
+		// deploy deployer contract
+		if i == 1 {
+			nonce++
+			txOpts.Nonce.SetInt64(nonce)
+			deployerAddress, tx, deployer, err = contracts.DeployDeployer(txOpts, backend)
+			if err != nil {
+				panic(err)
+			}
+
+			b.AddTx(tx)
+
+			log.Info(fmt.Sprintf("Deployer address: %s", deployerAddress.Hex()))
+		}
+
+		//  initialize create2 contracts
+		if i == 2 {
+			for _, account := range accounts {
+				if account.Code != nil {
+					tx = deploy(account.Code, account.Salt)
+					b.AddTx(tx)
+				}
+			}
+		}
 	})
 	_, _ = blockchain.InsertChain(blocks)
 

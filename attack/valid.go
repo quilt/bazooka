@@ -2,21 +2,19 @@ package attack
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/lightclient/bazooka/routine"
 )
 
-var ATTACKS = []string{"sample"}
-
 func IsValidAttack(s string) bool {
-	for _, a := range ATTACKS {
-		if a == s {
-			return true
-		}
+	_, err := os.Stat(s)
+	if err == nil {
+		return true
 	}
 
-	return false
+	return true
 }
 
 func AttackRunnerFromString(s string, c chan routine.Routine) (*Runner, error) {
