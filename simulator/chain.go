@@ -13,7 +13,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/lightclient/bazooka/attack"
 	"github.com/lightclient/bazooka/simulator/contracts"
@@ -36,7 +35,7 @@ func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Accoun
 	txOpts.GasPrice = big.NewInt(1)
 	txOpts.GasLimit = 20 * params.TxGas
 	txOpts.Nonce = big.NewInt(0)
-	var nonce int64 = -1
+	var nonce uint64 = 0
 
 	backend := &NoopBackend{db: db, genesis: genesis}
 
@@ -46,8 +45,9 @@ func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Accoun
 		var fixedSalt [32]byte
 		copy(fixedSalt[:], salt[:])
 
+		txOpts.Nonce.SetUint64(nonce)
 		nonce++
-		txOpts.Nonce.SetInt64(nonce)
+
 		tx, err := deployer.Deploy(txOpts, code, fixedSalt)
 		if err != nil {
 			panic(err)
@@ -55,28 +55,50 @@ func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Accoun
 		return tx
 	}
 
+	var transfer = func(to common.Address, amt uint64) *types.Transaction {
+		tx := types.NewTransaction(nonce, to, big.NewInt(int64(amt)), params.TxGas, nil, nil)
+		tx, err := types.SignTx(tx, types.NewEIP155Signer(big.NewInt(1337)), coinbaseKey)
+		if err != nil {
+			panic(err)
+		}
+
+		nonce++
+
+		return tx
+	}
+
 	genesisBlock := genesis.MustCommit(db)
 
 	engine := ethash.NewFaker()
 	blockchain, _ := core.NewBlockChain(db, nil, params.AllEthashProtocolChanges, engine, vm.Config{}, nil)
-	blocks, _ := core.GenerateChain(params.TestChainConfig, genesisBlock, engine, db, n, func(i int, b *core.BlockGen) {
+	blocks, _ := core.GenerateChain(genesis.Config, genesisBlock, engine, db, n, func(i int, b *core.BlockGen) {
 		b.SetCoinbase(crypto.PubkeyToAddress(coinbaseKey.PublicKey))
 		b.SetExtra(common.BigToHash(big.NewInt(42)).Bytes())
 
 		var tx *types.Transaction
 
-		// deploy deployer contract
+		// deploy deployer contract and initialize EOAs
 		if i == 1 {
-			nonce++
-			txOpts.Nonce.SetInt64(nonce)
+			txOpts.Nonce.SetUint64(nonce)
 			deployerAddress, tx, deployer, err = contracts.DeployDeployer(txOpts, backend)
 			if err != nil {
 				panic(err)
 			}
 
+			nonce++
 			b.AddTx(tx)
 
-			log.Info(fmt.Sprintf("Deployer address: %s", deployerAddress.Hex()))
+			// send balances
+			for addr, account := range accounts {
+				if account.Code == nil {
+					if account.Key == nil {
+						panic("EOAs must specify a key")
+					} else if account.Balance != 0 {
+						tx := transfer(addr, account.Balance)
+						b.AddTx(tx)
+					}
+				}
+			}
 		}
 
 		//  initialize create2 contracts
