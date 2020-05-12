@@ -1,7 +1,7 @@
 accounts:
   0xedA57AB4338f49Bd840beE7ec92d16566d252CB0:
     key: 0x6bc675727ac151cb210a42c1424cd4ad23cc5ce7461f37dd8cfdf35718d7896e 
-    balance: 1
+    balance: 0xDE0B6B3A7640000
   0x7c4f669eeab9ee4bf4006404debde0b636294817:
     code: 0x600360076000F36000F3
     salt: 0x00
@@ -9,3 +9,14 @@ accounts:
     code: 0x600360076000F36000F3
     salt: 0x01
 routines:
+  - ty: 0
+    from: 0
+    transactions:
+      - from: 0xedA57AB4338f49Bd840beE7ec92d16566d252CB0
+        to: 0x7c4f669eeab9ee4bf4006404debde0b636294817
+        nonce: 0
+        amount: 100
+        gas-price: 0x2540BE400
+        gas-limit: 0x61A8
+
+

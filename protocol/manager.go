@@ -8,17 +8,17 @@ import (
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/lightclient/bazooka/routine"
+	"github.com/lightclient/bazooka/attack"
 )
 
 type Manager struct {
 	chain        *core.BlockChain
 	blockMarkers []uint64
-	Routines     chan routine.Routine
+	Routines     chan attack.Routine
 }
 
 func NewManager(bc *core.BlockChain) *Manager {
-	return &Manager{chain: bc, Routines: make(chan routine.Routine, 10)}
+	return &Manager{chain: bc, Routines: make(chan attack.Routine, 10)}
 }
 
 func (pm *Manager) markBlockSent(blockNumber uint) bool {

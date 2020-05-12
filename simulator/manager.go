@@ -6,7 +6,6 @@ import (
 	"github.com/lightclient/bazooka/attack"
 	"github.com/lightclient/bazooka/p2p"
 	"github.com/lightclient/bazooka/protocol"
-	"github.com/lightclient/bazooka/routine"
 )
 
 type Manager struct {
@@ -49,6 +48,6 @@ func (m *Manager) StopServers() {
 	}
 }
 
-func (m *Manager) GetRoutinesChannel(idx int) chan routine.Routine {
+func (m *Manager) GetRoutinesChannel(idx int) chan attack.Routine {
 	return m.pms[idx].Routines
 }

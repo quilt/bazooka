@@ -21,14 +21,10 @@ var runCmd = &cobra.Command{
 	Short: "run an attack against a victim node",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			return errors.New("requires an attack name to execute")
+			return errors.New("requires an attack yaml to execute")
 		}
 
-		if attack.IsValidAttack(args[0]) {
-			return nil
-		}
-
-		return fmt.Errorf("unknown attack specified: %s", args[0])
+		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		setupLogger()
@@ -40,23 +36,15 @@ var runCmd = &cobra.Command{
 			panic(fmt.Errorf("Error loading attack: %s", err))
 		}
 
-		// fmt.Printf("%v", attack)
-
-		db := rawdb.NewMemoryDatabase()
-
-		blockchain, err := simulator.InitBlockchain(db, attack.Accounts)
+		blockchain, err := simulator.InitBlockchain(rawdb.NewMemoryDatabase(), attack.Accounts)
 		if err != nil {
 			panic(fmt.Errorf("Error initializing chain: %s", err))
 		}
 
 		sm := simulator.NewManager(blockchain, 1)
 
-		// runner, err := attack.AttackRunnerFromString(args[0], sm.GetRoutinesChannel(0))
-		if err != nil {
-			panic(fmt.Errorf("Error initializing attack: %s", err))
-		}
-
-		// runner.Run()
+		runner := attack.NewRunner(sm.GetRoutinesChannel(0))
+		runner.Run()
 
 		sm.StartServers()
 		time.Sleep(30 * time.Second)

@@ -1,12 +1,8 @@
 package attack
 
-import (
-	"github.com/lightclient/bazooka/routine"
-)
-
 type Runner struct {
-	routines []routine.Routine
-	c        chan routine.Routine
+	routines []Routine
+	c        chan Routine
 }
 
 func (r *Runner) Run() error {
@@ -15,4 +11,9 @@ func (r *Runner) Run() error {
 	}
 
 	return nil
+}
+
+func (a *Attack) NewRunner(c chan Routine) Runner {
+	a.SignAll()
+	return Runner{routines: a.Routines, c: c}
 }

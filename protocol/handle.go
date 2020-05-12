@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/lightclient/bazooka/routine"
+	"github.com/lightclient/bazooka/attack"
 )
 
 func RunProtocol(pm *Manager, peer *p2p.Peer, rw p2p.MsgReadWriter) error {
@@ -152,18 +152,19 @@ func (pm *Manager) handleNewBlockHashesMsg(msg p2p.Msg, rw p2p.MsgReadWriter) (b
 	return syncComplete, nil
 }
 
-func (pm *Manager) handleRoutine(r routine.Routine, rw p2p.MsgReadWriter) (bool, error) {
+func (pm *Manager) handleRoutine(r attack.Routine, rw p2p.MsgReadWriter) (bool, error) {
 	log.Info(fmt.Sprintf("Handling routine: %d", r.Ty))
 
 	switch r.Ty {
-	case routine.SendBlock:
+	case attack.SendBlock:
 		return false, p2p.Send(rw, eth.NewBlockMsg, r.Block)
-	case routine.SendTxs:
-		return false, p2p.Send(rw, eth.TransactionMsg, r.Transactions)
-	case routine.Sleep:
+	case attack.SendTxs:
+		log.Info(fmt.Sprintf("Sending new transaction msg: %d", len(r.SignedTransactions)))
+		return false, p2p.Send(rw, eth.TransactionMsg, r.SignedTransactions)
+	case attack.Sleep:
 		time.Sleep(r.SleepDuration)
 		return false, nil
-	case routine.Exit:
+	case attack.Exit:
 		return true, nil
 	default:
 		return false, fmt.Errorf("Unrecognized routine type")
