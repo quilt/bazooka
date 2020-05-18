@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -23,16 +24,19 @@ func RunProtocol(pm *Manager, peer *p2p.Peer, rw p2p.MsgReadWriter) error {
 
 	for {
 		if syncComplete {
-			r := <-pm.Routines
-			exit, err := pm.handleRoutine(r, rw)
-			if err != nil {
-				return err
-			}
-			if exit != false {
-				break
+			for {
+				r := <-pm.Routines
+				exit, err := pm.handleRoutine(r, rw)
+				if err != nil {
+					return err
+				}
+				if exit != false {
+					break
+				}
 			}
 		}
 
+		log.Info("waiting for new msg")
 		msg, err := rw.ReadMsg()
 		if err != nil {
 			return fmt.Errorf("failed to receive message from peer: %w", err)
@@ -157,7 +161,10 @@ func (pm *Manager) handleRoutine(r attack.Routine, rw p2p.MsgReadWriter) (bool, 
 
 	switch r.Ty {
 	case attack.SendBlock:
-		return false, p2p.Send(rw, eth.NewBlockMsg, r.Block)
+		block := r.SignedBlock
+		td := big.NewInt(1000)
+		log.Info(fmt.Sprintf("Sending new block msg: %#v", r))
+		return false, p2p.Send(rw, eth.NewBlockMsg, []interface{}{&block, td})
 	case attack.SendTxs:
 		log.Info(fmt.Sprintf("Sending new transaction msg: %d", len(r.SignedTransactions)))
 		return false, p2p.Send(rw, eth.TransactionMsg, r.SignedTransactions)

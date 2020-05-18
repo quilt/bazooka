@@ -14,9 +14,11 @@ type Manager struct {
 	attack  attack.Runner
 }
 
-func NewManager(chain *core.BlockChain, n int) Manager {
+func NewManager(chain *core.BlockChain) Manager {
 	var pms []*protocol.Manager
-	for i := 0; i < n; i++ {
+
+	// eventually will support multiple attackers
+	for i := 0; i < 1; i++ {
 		pms = append(pms, protocol.NewManager(chain))
 	}
 

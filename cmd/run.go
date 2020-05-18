@@ -41,9 +41,9 @@ var runCmd = &cobra.Command{
 			panic(fmt.Errorf("Error initializing chain: %s", err))
 		}
 
-		sm := simulator.NewManager(blockchain, 1)
+		sm := simulator.NewManager(blockchain)
 
-		runner := attack.NewRunner(sm.GetRoutinesChannel(0))
+		runner := attack.NewRunner(blockchain, sm.GetRoutinesChannel(0))
 		runner.Run()
 
 		sm.StartServers()

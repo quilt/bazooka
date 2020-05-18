@@ -10,7 +10,6 @@ accounts:
     salt: 0x01
 routines:
   - ty: 0
-    from: 0
     transactions:
       - from: 0xedA57AB4338f49Bd840beE7ec92d16566d252CB0
         to: 0x7c4f669eeab9ee4bf4006404debde0b636294817
@@ -18,5 +17,13 @@ routines:
         amount: 100
         gas-price: 0x2540BE400
         gas-limit: 0x61A8
-
+  - ty: 1
+    transactions:
+      - from: 0xedA57AB4338f49Bd840beE7ec92d16566d252CB0
+        to: 0x7c4f669eeab9ee4bf4006404debde0b636294817
+        nonce: 0
+        amount: 100
+        gas-price: 0x2540BE400
+        gas-limit: 0x61A8
+    
 
