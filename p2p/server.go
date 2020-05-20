@@ -3,6 +3,7 @@ package p2p
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
@@ -49,7 +50,8 @@ func AddLocalPeer(server *p2p.Server) error {
 }
 
 func GetTargetAddr() (*enode.Node, error) {
-	nodeKeyHex, err := ioutil.ReadFile("/home/matt/eth/aasim/geth/nodekey")
+	nodekeyDir := fmt.Sprintf("%s/eth/aasim/geth/nodekey", os.Getenv("HOME"))
+	nodeKeyHex, err := ioutil.ReadFile(nodekeyDir)
 	if err != nil {
 		return nil, err
 	}
