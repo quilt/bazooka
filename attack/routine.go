@@ -35,7 +35,7 @@ func (tx *Transaction) toEthType() *types.Transaction {
 
 type Routine struct {
 	Ty                 int
-	Transactions       []Transaction
+	Transactions       []*Transaction
 	SignedTransactions types.Transactions
 	SignedBlock        *types.Block
 	SleepDuration      time.Duration

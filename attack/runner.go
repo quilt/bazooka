@@ -15,9 +15,11 @@ func (r *Runner) Run() error {
 	return nil
 }
 
-func (a *Attack) NewRunner(bc *core.BlockChain, c chan Routine) Runner {
-	a.SignAll()
-	a.MakeBlocks(bc)
+func (a *Attack) NewRunner(bc *core.BlockChain, c chan Routine) (*Runner, error) {
+	err := a.SignAndAssemble(bc)
+	if err != nil {
+		return nil, err
+	}
 
-	return Runner{routines: a.Routines, c: c}
+	return &Runner{routines: a.Routines, c: c}, nil
 }

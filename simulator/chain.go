@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/big"
+	"os"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -13,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/lightclient/bazooka/attack"
 	"github.com/lightclient/bazooka/simulator/contracts"
@@ -23,7 +25,7 @@ func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Accoun
 
 	genesis, err := Genesis()
 	if err != nil {
-		panic(fmt.Errorf("Could not create genesis: %s", err))
+		return nil, err
 	}
 
 	coinbaseKey, err := crypto.HexToECDSA("ad0f3019b6b8634c080b574f3d8a47ef975f0e4b9f63e82893e9a7bb59c2d609")
@@ -50,7 +52,8 @@ func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Accoun
 
 		tx, err := deployer.Deploy(txOpts, code, fixedSalt)
 		if err != nil {
-			panic(err)
+			log.Error(fmt.Sprintf("Unable to deploy contract: %s", err))
+			os.Exit(1)
 		}
 		return tx
 	}
@@ -59,7 +62,8 @@ func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Accoun
 		tx := types.NewTransaction(nonce, to, big.NewInt(int64(amt)), params.TxGas, nil, nil)
 		tx, err := types.SignTx(tx, types.NewEIP155Signer(big.NewInt(1337)), coinbaseKey)
 		if err != nil {
-			panic(err)
+			log.Error(fmt.Sprintf("Unable to sign tx: %s", err))
+			os.Exit(1)
 		}
 
 		nonce++
@@ -82,7 +86,8 @@ func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Accoun
 			txOpts.Nonce.SetUint64(nonce)
 			deployerAddress, tx, deployer, err = contracts.DeployDeployer(txOpts, backend)
 			if err != nil {
-				panic(err)
+				log.Error(fmt.Sprintf("Unable to deploy Deployer: %s", err))
+				os.Exit(1)
 			}
 
 			nonce++

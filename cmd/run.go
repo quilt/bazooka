@@ -27,23 +27,34 @@ var runCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+		defer func() {
+			if err != nil {
+				log.Error(fmt.Sprintf("%s", err))
+			}
+		}()
+
 		setupLogger()
 
 		var attack attack.Attack
 
-		err := attack.Load(args[0])
+		err = attack.Load(args[0])
 		if err != nil {
-			panic(fmt.Errorf("Error loading attack: %s", err))
+			return
 		}
 
 		blockchain, err := simulator.InitBlockchain(rawdb.NewMemoryDatabase(), attack.Accounts)
 		if err != nil {
-			panic(fmt.Errorf("Error initializing chain: %s", err))
+			return
 		}
 
 		sm := simulator.NewManager(blockchain)
 
-		runner := attack.NewRunner(blockchain, sm.GetRoutinesChannel(0))
+		runner, err := attack.NewRunner(blockchain, sm.GetRoutinesChannel(0))
+		if err != nil {
+			return
+		}
+
 		runner.Run()
 
 		sm.StartServers()
