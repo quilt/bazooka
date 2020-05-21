@@ -1,13 +1,15 @@
-accounts:
-  0xedA57AB4338f49Bd840beE7ec92d16566d252CB0:
-    key: 0x6bc675727ac151cb210a42c1424cd4ad23cc5ce7461f37dd8cfdf35718d7896e 
-    balance: 0xDE0B6B3A7640000
-  0x7c4f669eeab9ee4bf4006404debde0b636294817:
-    code: 0x600360076000F36000F3
-    salt: 0x00
-  0xa30d8e8d4566a3582eae0e247942e792339dbf9d:
-    code: 0x600360076000F36000F3
-    salt: 0x01
+initialization:
+  height: 10
+  accounts:
+    0xedA57AB4338f49Bd840beE7ec92d16566d252CB0:
+      key: 0x6bc675727ac151cb210a42c1424cd4ad23cc5ce7461f37dd8cfdf35718d7896e 
+      balance: 0xDE0B6B3A7640000
+    0x7c4f669eeab9ee4bf4006404debde0b636294817:
+      code: 0x600360076000F36000F3
+      salt: 0x00
+    0xa30d8e8d4566a3582eae0e247942e792339dbf9d:
+      code: 0x600360076000F36000F3
+      salt: 0x01
 routines:
   - ty: 0
     transactions:
@@ -25,5 +27,24 @@ routines:
         amount: 100
         gas-price: 0x2540BE400
         gas-limit: 0x61A8
-    
-
+  - ty: 1
+    transactions:
+      - from: 0xedA57AB4338f49Bd840beE7ec92d16566d252CB0
+        to: 0x7c4f669eeab9ee4bf4006404debde0b636294817
+        nonce: 1
+        amount: 100
+        gas-price: 0x2540BE400
+        gas-limit: 0x61A8
+  - ty: 2
+    sleep-duration: 5s
+  - ty: 0
+    transactions:
+      - from: 0xedA57AB4338f49Bd840beE7ec92d16566d252CB0
+        to: 0x7c4f669eeab9ee4bf4006404debde0b636294817
+        nonce: 2
+        amount: 0xDE0B6B3A7640000
+        gas-price: 0x2540BE400
+        gas-limit: 0x61A8
+  - ty: 2
+    sleep-duration: 5s
+  - ty: 3

@@ -8,6 +8,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Initialization struct {
+	Height   uint64
+	Accounts map[common.Address]Account
+}
+
 type Account struct {
 	Key     hexutil.Bytes
 	Balance uint64
@@ -16,7 +21,7 @@ type Account struct {
 }
 
 type Attack struct {
-	Accounts map[common.Address]Account
+	Initialization
 	Routines []Routine
 }
 
@@ -31,4 +36,8 @@ func (a *Attack) Load(s string) error {
 	}
 
 	return nil
+}
+
+func (a *Attack) Accounts() map[common.Address]Account {
+	return a.Initialization.Accounts
 }

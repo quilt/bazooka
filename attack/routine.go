@@ -1,7 +1,6 @@
 package attack
 
 import (
-	"fmt"
 	"math/big"
 	"time"
 
@@ -28,7 +27,6 @@ type Transaction struct {
 }
 
 func (tx *Transaction) toEthType() *types.Transaction {
-	fmt.Printf("gas price: %d, gas limit: %d\n", tx.GasPrice, tx.GasPrice)
 	ret := types.NewTransaction(tx.Nonce, tx.To, big.NewInt(int64(tx.Amount)), tx.GasLimit, big.NewInt(int64(tx.GasPrice)), tx.Data)
 	return ret
 }
@@ -38,5 +36,5 @@ type Routine struct {
 	Transactions       []*Transaction
 	SignedTransactions types.Transactions
 	SignedBlock        *types.Block
-	SleepDuration      time.Duration
+	SleepDuration      time.Duration `yaml:"sleep-duration"`
 }

@@ -31,12 +31,11 @@ func RunProtocol(pm *Manager, peer *p2p.Peer, rw p2p.MsgReadWriter) error {
 					return err
 				}
 				if exit != false {
-					break
+					return nil
 				}
 			}
 		}
 
-		log.Info("waiting for new msg")
 		msg, err := rw.ReadMsg()
 		if err != nil {
 			return fmt.Errorf("failed to receive message from peer: %w", err)
@@ -59,8 +58,6 @@ func RunProtocol(pm *Manager, peer *p2p.Peer, rw p2p.MsgReadWriter) error {
 			log.Trace("Unrecognized message", "msg", msg)
 		}
 	}
-
-	return nil
 }
 
 func (pm *Manager) handleGetBlockHeaderMsg(msg p2p.Msg, rw p2p.MsgReadWriter) error {

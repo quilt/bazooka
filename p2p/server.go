@@ -67,7 +67,7 @@ func GetTargetAddr() (*enode.Node, error) {
 		return nil, fmt.Errorf("could not parse the node info: %w", err)
 	}
 
-	log.Info("Parsed node: %s, IP: %s\n", nodeToConnect, nodeToConnect.IP())
+	log.Info(fmt.Sprintf("Parsed node: %s, IP: %s\n", nodeToConnect, nodeToConnect.IP()))
 
 	return nodeToConnect, nil
 }

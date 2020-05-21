@@ -43,7 +43,7 @@ var runCmd = &cobra.Command{
 			return
 		}
 
-		blockchain, err := simulator.InitBlockchain(rawdb.NewMemoryDatabase(), attack.Accounts)
+		blockchain, err := simulator.InitBlockchain(rawdb.NewMemoryDatabase(), attack.Initialization.Height, attack.Initialization.Accounts)
 		if err != nil {
 			return
 		}

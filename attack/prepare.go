@@ -2,19 +2,22 @@ package attack
 
 import (
 	"math/big"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 )
 
 func (a *Attack) SignAndAssemble(bc *core.BlockChain) error {
+	// for now, assume the blocks will only be defined in a contiguous manner
+	blockHeight := bc.CurrentHeader().Number.Uint64() + 1
+
 	for i, r := range a.Routines {
 		if r.Ty == SendTxs || r.Ty == SendBlock {
-			txs, err := signTransactions(a.Accounts, r.Transactions)
+			txs, err := signTransactions(a.Accounts(), r.Transactions)
 			if err != nil {
 				return err
 			}
@@ -23,14 +26,17 @@ func (a *Attack) SignAndAssemble(bc *core.BlockChain) error {
 		}
 
 		if r.Ty == SendBlock {
-			block, err := assembleBlock(bc, r.SignedTransactions)
+			block, err := assembleBlock(bc, a.Routines[i].SignedTransactions, blockHeight)
 			if err != nil {
 				return err
 			}
 
+			blockHeight += 1
 			a.Routines[i].SignedBlock = block
 		}
 	}
+
+	bc.SetHead(a.Initialization.Height)
 
 	return nil
 }
@@ -52,23 +58,21 @@ func signTransactions(accounts map[common.Address]Account, txs []*Transaction) (
 	return stxs, nil
 }
 
-func assembleBlock(bc *core.BlockChain, txs []*types.Transaction) (*types.Block, error) {
-	current := bc.CurrentHeader().Number.Uint64()
-	parent := bc.GetBlockByNumber(current)
+func assembleBlock(bc *core.BlockChain, txs []*types.Transaction, height uint64) (*types.Block, error) {
+	parent := bc.GetBlockByNumber(height - 1)
 	coinbase := parent.Coinbase()
-	timestamp := uint64(time.Now().Unix())
-
+	timestamp := uint64(parent.Time() + 10)
 	gasLimit := core.CalcGasLimit(parent, 9223372036854775807, 9223372036854775807)
 
 	header := &types.Header{
 		ParentHash: parent.Hash(),
-		Number:     big.NewInt(int64(current + 1)),
+		Number:     big.NewInt(int64(height)),
 		GasLimit:   gasLimit,
 		Extra:      []byte{},
 		Time:       timestamp,
+		Coinbase:   coinbase,
 	}
 
-	header.Coinbase = coinbase
 	bc.Engine().Prepare(bc, header)
 
 	statedb, err := bc.StateAt(parent.Root())
@@ -77,11 +81,10 @@ func assembleBlock(bc *core.BlockChain, txs []*types.Transaction) (*types.Block,
 	}
 
 	gasPool := new(core.GasPool).AddGas(header.GasLimit)
-	txCount := 0
 	var receipts []*types.Receipt
 	var blockFull = gasPool.Gas() < params.TxGas
 
-	for _, tx := range txs {
+	for txCount, tx := range txs {
 		if blockFull {
 			break
 		}
@@ -97,12 +100,15 @@ func assembleBlock(bc *core.BlockChain, txs []*types.Transaction) (*types.Block,
 			statedb,
 			header, tx, &header.GasUsed, *bc.GetVMConfig(),
 		)
+
 		if err != nil {
+			log.Error("Transaction failed", "tx number", txCount)
 			statedb.RevertToSnapshot(snap)
 			break
 		}
+
 		receipts = append(receipts, receipt)
-		txCount++
+
 		if gasPool.Gas() < params.TxGas {
 			blockFull = true
 			break
@@ -114,7 +120,10 @@ func assembleBlock(bc *core.BlockChain, txs []*types.Transaction) (*types.Block,
 		return nil, err
 	}
 
-	bc.SetHead(current)
+	_, err = bc.InsertChain([]*types.Block{block})
+	if err != nil {
+		return nil, err
+	}
 
 	return block, nil
 }

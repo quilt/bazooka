@@ -20,9 +20,7 @@ import (
 	"github.com/lightclient/bazooka/simulator/contracts"
 )
 
-func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Account) (*core.BlockChain, error) {
-	n := 10
-
+func InitBlockchain(db ethdb.Database, height uint64, accounts map[common.Address]attack.Account) (*core.BlockChain, error) {
 	genesis, err := Genesis()
 	if err != nil {
 		return nil, err
@@ -75,7 +73,7 @@ func InitBlockchain(db ethdb.Database, accounts map[common.Address]attack.Accoun
 
 	engine := ethash.NewFaker()
 	blockchain, _ := core.NewBlockChain(db, nil, params.AllEthashProtocolChanges, engine, vm.Config{}, nil)
-	blocks, _ := core.GenerateChain(genesis.Config, genesisBlock, engine, db, n, func(i int, b *core.BlockGen) {
+	blocks, _ := core.GenerateChain(genesis.Config, genesisBlock, engine, db, int(height), func(i int, b *core.BlockGen) {
 		b.SetCoinbase(crypto.PubkeyToAddress(coinbaseKey.PublicKey))
 		b.SetExtra(common.BigToHash(big.NewInt(42)).Bytes())
 
