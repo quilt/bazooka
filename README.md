@@ -36,7 +36,7 @@ $ bgeth --datadir ~/.eth/bazooka --nodiscover --fakepow --syncmode full --verbos
 Finally, to begin an attack from this repository:
 
 ```console
-$ bazooka run {attack name}
+$ bazooka run {attack yaml}
 ```
 
 ### Specifying an Attack
