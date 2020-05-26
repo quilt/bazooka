@@ -21,7 +21,7 @@ A patched version of `geth` is used to bypass PoW verification. To download and
 build it from source, run the following:
 
 ```console
-$ git clone git@github.com:lightclient/go-ethereum.git && cd go-ethereum && make
+$ git clone -b account-abstraction git@github.com:quilt/go-ethereum.git && cd go-ethereum && make
 $ mv build/bin/geth build/bin/bgeth
 $ export PATH="build/bin":$PATH
 ```

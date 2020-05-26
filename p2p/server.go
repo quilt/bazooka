@@ -50,7 +50,11 @@ func AddLocalPeer(server *p2p.Server) error {
 }
 
 func GetTargetAddr() (*enode.Node, error) {
-	nodekeyDir := fmt.Sprintf("%s/eth/aasim/geth/nodekey", os.Getenv("HOME"))
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	nodekeyDir := fmt.Sprintf("%s/.eth-sim/geth/nodekey", cwd)
 	nodeKeyHex, err := ioutil.ReadFile(nodekeyDir)
 	if err != nil {
 		return nil, err
