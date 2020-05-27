@@ -1,10 +1,9 @@
 #!/bin/sh
 
+
 GETH=$(pwd)/geth
 SIM=$(pwd)/.eth-sim
 
-
-# check if quilt/geth exists locally
 
 usage() {
 	echo "usage: run.sh { build | [run ROUTINE] }"
@@ -44,11 +43,13 @@ run() {
 rm -r $SIM 2> /dev/null
 
 
+# check if quilt/geth already exists
 if [ ! -d $GETH ]
 then
 	init
 fi
 
+# run script
 case $1 in 
 	"build")
 		build
