@@ -5,7 +5,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/forkid"
-	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/lightclient/bazooka/attack"
@@ -36,7 +35,7 @@ func (pm *Manager) markBlockSent(blockNumber uint) bool {
 }
 
 func syncHandshake(bc *core.BlockChain, rw p2p.MsgReadWriter) error {
-	status := eth.StatusData{
+	status := statusData{
 		ProtocolVersion: 64,
 		NetworkID:       1337,
 		TD:              bc.CurrentBlock().Difficulty(),

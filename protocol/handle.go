@@ -61,7 +61,7 @@ func RunProtocol(pm *Manager, peer *p2p.Peer, rw p2p.MsgReadWriter) error {
 }
 
 func (pm *Manager) handleGetBlockHeaderMsg(msg p2p.Msg, rw p2p.MsgReadWriter) error {
-	var query eth.GetBlockHeadersData
+	var query getBlockHeadersData
 	if err := msg.Decode(&query); err != nil {
 		return fmt.Errorf("failed to decode msg %v: %w", msg, err)
 	}
@@ -136,7 +136,7 @@ func (pm *Manager) handleGetBlockBodiesMsg(msg p2p.Msg, rw p2p.MsgReadWriter) er
 }
 
 func (pm *Manager) handleNewBlockHashesMsg(msg p2p.Msg, rw p2p.MsgReadWriter) (bool, error) {
-	var blockHashMsg eth.NewBlockHashesData
+	var blockHashMsg newBlockHashesData
 	if err := msg.Decode(&blockHashMsg); err != nil {
 		return false, fmt.Errorf("failed to decode msg %v: %w", msg, err)
 	}

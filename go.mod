@@ -11,4 +11,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.4
 )
 
-replace github.com/ethereum/go-ethereum => github.com/lightclient/go-ethereum v1.9.13-lc1
+replace github.com/ethereum/go-ethereum => ./geth
