@@ -12,7 +12,7 @@ usage() {
 init() {
 	echo "Cloning quilt/geth"
 	git clone -b account-abstraction https://github.com/quilt/go-ethereum geth
-	git --git-dir geth/.git --work-tree geth rebase origin/fake-pow-patch
+	git --git-dir geth/.git --work-tree geth rebase -X theirs origin/fake-pow-patch
 	make -C $GETH
 }
 
