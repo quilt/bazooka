@@ -2,12 +2,12 @@
 
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue)](https://github.com/lightclient/fast-evm)
 
-An attack orchestration tool targeting Ethereum clients.
+A p2p load testing tool for Ethereum clients.
 
 ### Overview
 
 Like a rocket launcher, `bazooka` is designed to overwhelm its target. It
-carries out pre-defined attack strategies in a deterministic fashion.
+carries out pre-defined load testing strategies in a deterministic fashion.
 By executing atop `devp2p` it is portable across all proper Ethereum clients.
 Unlike other tools [[1]](https://github.com/ethereum/hive)
 [[2]](https://github.com/ethereum/retesteth) that focus on consistency &
@@ -33,13 +33,13 @@ $ bgeth --datadir ~/.eth/bazooka init genesis.json
 $ bgeth --datadir ~/.eth/bazooka --nodiscover --fakepow --syncmode full --verbosity 5 --bootnodes "" --networkid 1337
 ```
 
-Finally, to begin an attack from this repository:
+Finally, to begin a test from this repository:
 
 ```console
-$ bazooka run {attack yaml}
+$ bazooka run {routine yaml}
 ```
 
-### Specifying an Attack
+### Specifying an Routine
 
 TODO
 
