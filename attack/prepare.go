@@ -4,6 +4,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -45,14 +46,28 @@ func signTransactions(accounts map[common.Address]Account, txs []*Transaction) (
 	stxs := make([]*types.Transaction, 0)
 
 	for _, tx := range txs {
-		priv, err := crypto.ToECDSA(accounts[tx.From].Key)
+		// use key if exists
+		if accounts[tx.From].Key.String() != "0x" {
+			priv, err := crypto.ToECDSA(accounts[tx.From].Key)
 
-		signedTx, err := types.SignTx(tx.toEthType(), types.NewEIP155Signer(big.NewInt(1337)), priv)
-		if err != nil {
-			return nil, err
+			signedTx, err := types.SignTx(tx.toEthType(), types.NewEIP155Signer(big.NewInt(1337)), priv)
+			if err != nil {
+				return nil, err
+			}
+
+			stxs = append(stxs, signedTx)
+
+		} else {
+			// otherwise, assume it is AA
+			priv, err := crypto.ToECDSA(hexutil.MustDecode("0x6bc675727ac151cb210a42c1424cd4ad23cc5ce7461f37dd8cfdf35718d7896e"))
+
+			signedTx, err := types.SignTx(tx.toEthType(), types.NewEIP155Signer(big.NewInt(1337)), priv)
+			if err != nil {
+				return nil, err
+			}
+
+			stxs = append(stxs, signedTx.WithAASignature2())
 		}
-
-		stxs = append(stxs, signedTx)
 	}
 
 	return stxs, nil

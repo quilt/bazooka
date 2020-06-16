@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 const (
@@ -27,6 +28,7 @@ type Transaction struct {
 }
 
 func (tx *Transaction) toEthType() *types.Transaction {
+	log.Error("to eth type", "to", tx.To)
 	ret := types.NewTransaction(tx.Nonce, tx.To, big.NewInt(int64(tx.Amount)), tx.GasLimit, big.NewInt(int64(tx.GasPrice)), tx.Data)
 	return ret
 }
