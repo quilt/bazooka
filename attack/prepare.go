@@ -45,14 +45,21 @@ func signTransactions(accounts map[common.Address]Account, txs []*Transaction) (
 	stxs := make([]*types.Transaction, 0)
 
 	for _, tx := range txs {
-		priv, err := crypto.ToECDSA(accounts[tx.From].Key)
+		// use key if exists
+		if accounts[tx.From].Key.String() != "0x" {
+			priv, err := crypto.ToECDSA(accounts[tx.From].Key)
 
-		signedTx, err := types.SignTx(tx.toEthType(), types.NewEIP155Signer(big.NewInt(1337)), priv)
-		if err != nil {
-			return nil, err
+			signedTx, err := types.SignTx(tx.toEthType(), types.NewEIP155Signer(big.NewInt(1337)), priv)
+			if err != nil {
+				return nil, err
+			}
+
+			stxs = append(stxs, signedTx)
+
+		} else {
+			// otherwise, assume it is AA
+			stxs = append(stxs, tx.toEthType().WithAASignature())
 		}
-
-		stxs = append(stxs, signedTx)
 	}
 
 	return stxs, nil

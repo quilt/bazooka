@@ -83,23 +83,22 @@ func InitBlockchain(db ethdb.Database, height uint64, accounts map[common.Addres
 		if i == 1 {
 			txOpts.Nonce.SetUint64(nonce)
 			deployerAddress, tx, deployer, err = contracts.DeployDeployer(txOpts, backend)
+
 			if err != nil {
 				log.Error(fmt.Sprintf("Unable to deploy Deployer: %s", err))
 				os.Exit(1)
 			}
+
+			log.Info("create2 deployer deployed", "addr", deployerAddress)
 
 			nonce++
 			b.AddTx(tx)
 
 			// send balances
 			for addr, account := range accounts {
-				if account.Code == nil {
-					if account.Key == nil {
-						panic("EOAs must specify a key")
-					} else if account.Balance != 0 {
-						tx := transfer(addr, account.Balance)
-						b.AddTx(tx)
-					}
+				if account.Balance != 0 {
+					tx := transfer(addr, account.Balance)
+					b.AddTx(tx)
 				}
 			}
 		}

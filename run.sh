@@ -23,6 +23,11 @@ build() {
 run() {
 	rm -r $SIM
 
+	# update the shared genesis to be something convincing and pass this check:
+	# https://github.com/ethereum/go-ethereum/blob/56a319b9daa5228a6b22ecb1d07f8183ebd98106/eth/sync.go#L327
+	date=$(date +%s -d '12 hours ago')
+	sed -i 's/^  "timestamp": "[0-9]*",/  "timestamp": "'${date}'",/' genesis.json
+
 	$GETH/build/bin/geth --datadir $SIM init $(pwd)/genesis.json
 	echo "INIT COMPLETE -- STARTING GETH"
 
