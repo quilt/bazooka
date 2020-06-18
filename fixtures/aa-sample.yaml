@@ -7,7 +7,7 @@ initialization:
       balance: 0xDE0B6B3A7640000
 routines:
   - ty: 2
-    sleep-duration: 10s
+    sleep-duration: 3s
   - ty: 0
     transactions:
       - from: 0x0000000000000000000000000000000000000000
@@ -16,7 +16,7 @@ routines:
         nonce: 0
         amount: 0
         gas-price: 0x00
-        gas-limit: 0x00
+        gas-limit: 0x61A8
   - ty: 2
     sleep-duration: 5s
   - ty: 1
@@ -29,5 +29,5 @@ routines:
         gas-price: 0x00
         gas-limit: 0x61A8
   - ty: 2
-    sleep-duration: 1000s
+    sleep-duration: 5s
   - ty: 3
