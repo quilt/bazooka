@@ -154,18 +154,17 @@ func (pm *Manager) handleNewBlockHashesMsg(msg p2p.Msg, rw p2p.MsgReadWriter) (b
 }
 
 func (pm *Manager) handleRoutine(r attack.Routine, rw p2p.MsgReadWriter) (bool, error) {
-	log.Info(fmt.Sprintf("Handling routine: %d", r.Ty))
-
 	switch r.Ty {
+	case attack.SendTxs:
+		log.Info("Sending new transaction msg", "txs", len(r.SignedTransactions))
+		return false, p2p.Send(rw, eth.TransactionMsg, r.SignedTransactions)
 	case attack.SendBlock:
 		block := r.SignedBlock
 		td := big.NewInt(1000)
-		log.Info(fmt.Sprintf("Sending new block msg: %#v", r))
+		log.Info("Sending new block msg", "height", r.SignedBlock.Number())
 		return false, p2p.Send(rw, eth.NewBlockMsg, []interface{}{&block, td})
-	case attack.SendTxs:
-		log.Info(fmt.Sprintf("Sending new transaction msg: %d", len(r.SignedTransactions)))
-		return false, p2p.Send(rw, eth.TransactionMsg, r.SignedTransactions)
 	case attack.Sleep:
+		log.Info("Sleeping", "time", r.SleepDuration)
 		time.Sleep(r.SleepDuration)
 		return false, nil
 	case attack.Exit:
