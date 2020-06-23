@@ -17,31 +17,42 @@ regressions and DoS attack vectors in candidate modifications to clients.
 
 ### Usage
 
-A patched version of `geth` is used to bypass PoW verification. To download and
-build it from source, run the following:
+To initialize a patched version of Geth and run the sample routine against it,
+use the following commands:
 
 ```console
-$ git clone -b account-abstraction git@github.com:quilt/go-ethereum.git && cd go-ethereum && make
-$ mv build/bin/geth build/bin/bgeth
-$ export PATH="build/bin":$PATH
-```
-
-To initialize & start the patched version of `geth`:
-
-```console
-$ bgeth --datadir ~/.eth/bazooka init genesis.json
-$ bgeth --datadir ~/.eth/bazooka --nodiscover --fakepow --syncmode full --verbosity 5 --bootnodes "" --networkid 1337
-```
-
-Finally, to begin a test from this repository:
-
-```console
-$ bazooka run {routine yaml}
+$ ./run.sh build && ./run.sh run fixtures/sample.yaml
 ```
 
 ### Specifying an Routine
 
-TODO
+A routine has two main parts: the `initialization` and `routine`. 
+
+#### Initialization
+The first section allows you to define how many (empty) blocks the chain should
+start with and the accounts to generate. The `key` of the accounts map is the
+account's address. This should be derived from either the private key `key` or
+using the `create2` [formula](https://crates.io/crates/create2). The depoyer's
+address is `0xD2192C7F2EAEb1f05279c45D19828118e3D6f46C`.
+
+#### Routines
+
+There are 4 types of routines:
+
+| id | name  | description  |
+|--:|---|---|
+| 0 | NewTxs   | Announces transactions to the target node  |
+| 1 | NewBlock | Announces a new block to the target node |
+| 2 | Sleep    | Sleeps for a certain amount of time |
+| 3 | Exit     | Ends the current routine |
+
+A script `build-aa.sh` has also been included to generate input for the sample
+AA contract.
+
+#### Examples
+
+[sample.yaml](fixtures/sample.yaml)
+[aa-sample.yaml](fixtures/aa-sample.yaml)
 
 ### Contributions
 
