@@ -3,6 +3,7 @@ package protocol
 import (
 	"fmt"
 	"math/big"
+	"os"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -168,6 +169,8 @@ func (pm *Manager) handleRoutine(r attack.Routine, rw p2p.MsgReadWriter) (bool, 
 		time.Sleep(r.SleepDuration)
 		return false, nil
 	case attack.Exit:
+		log.Info("Exiting handler")
+		os.Exit(0)
 		return true, nil
 	default:
 		return false, fmt.Errorf("Unrecognized routine type")

@@ -1,8 +1,8 @@
 #/bin/bash
 
-if [ "$#" -ne 3 ]; then
-    echo "usage: build-aa.sh [loops] [success] [gas_price]"
+if [ "$#" -ne 4 ]; then
+    echo "usage: build-aa.sh [nonce] [loops] [success] [gas_price]"
     exit
 fi
 
-printf "0x%064d%064d%064d\n" $1 $2 $3
+printf "0x%064d%064d%064d%064d\n" $1 $2 $3 $4

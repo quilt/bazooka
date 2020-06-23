@@ -58,7 +58,7 @@ var runCmd = &cobra.Command{
 		runner.Run()
 
 		sm.StartServers()
-		time.Sleep(30 * time.Second)
+		time.Sleep(1000 * time.Second)
 		sm.StopServers()
 	},
 }
