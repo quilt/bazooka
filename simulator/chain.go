@@ -31,6 +31,8 @@ func InitBlockchain(db ethdb.Database, height uint64, accounts map[common.Addres
 		return nil, err
 	}
 
+	log.Info("coinbase", "addr", crypto.PubkeyToAddress(coinbaseKey.PublicKey))
+
 	txOpts := bind.NewKeyedTransactor(coinbaseKey)
 	txOpts.GasPrice = big.NewInt(1)
 	txOpts.GasLimit = 20 * params.TxGas
