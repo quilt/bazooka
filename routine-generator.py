@@ -147,7 +147,7 @@ def main():
     # make block
     block_txs = []
     for a in accounts:
-        tx = AATransaction(a.addr, 0, 1, True, 1).as_tx(45000)
+        tx = AATransaction(a.addr, 0, 1, True, 1).as_tx(44000)
         block_txs.append(tx)
 
     for i in range(0, len(block_txs)):
