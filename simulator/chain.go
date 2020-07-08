@@ -20,7 +20,13 @@ import (
 	"github.com/lightclient/bazooka/simulator/contracts"
 )
 
-func InitBlockchain(db ethdb.Database, height uint64, accounts map[common.Address]attack.Account) (*core.BlockChain, error) {
+func InitBlockchain(db ethdb.Database, height uint64, accountsMap map[common.Address]attack.Account) (*core.BlockChain, error) {
+	accounts := make([]attack.Account, 0)
+
+	for _, account := range accountsMap {
+		accounts = append(accounts, account)
+	}
+
 	genesis, err := Genesis()
 	if err != nil {
 		return nil, err
@@ -48,6 +54,7 @@ func InitBlockchain(db ethdb.Database, height uint64, accounts map[common.Addres
 		copy(fixedSalt[:], salt[:])
 
 		txOpts.Nonce.SetUint64(nonce)
+		txOpts.GasLimit = 100000
 		nonce++
 
 		tx, err := deployer.Deploy(txOpts, code, fixedSalt)
@@ -76,6 +83,8 @@ func InitBlockchain(db ethdb.Database, height uint64, accounts map[common.Addres
 	engine := ethash.NewFaker()
 	blockchain, _ := core.NewBlockChain(db, nil, params.AllEthashProtocolChanges, engine, vm.Config{}, nil)
 	blocks, _ := core.GenerateChain(genesis.Config, genesisBlock, engine, db, int(height), func(i int, b *core.BlockGen) {
+		gasSpent := uint64(0)
+
 		b.SetCoinbase(crypto.PubkeyToAddress(coinbaseKey.PublicKey))
 		b.SetExtra(common.BigToHash(big.NewInt(42)).Bytes())
 
@@ -97,7 +106,7 @@ func InitBlockchain(db ethdb.Database, height uint64, accounts map[common.Addres
 			b.AddTx(tx)
 
 			// send balances
-			for addr, account := range accounts {
+			for addr, account := range accountsMap {
 				if account.Balance != 0 {
 					tx := transfer(addr, account.Balance)
 					b.AddTx(tx)
@@ -106,14 +115,23 @@ func InitBlockchain(db ethdb.Database, height uint64, accounts map[common.Addres
 		}
 
 		//  initialize create2 contracts
-		if i == 2 {
-			for _, account := range accounts {
+		if i > 1 {
+			for len(accounts) != 0 && gasSpent < 800000 {
+				account := accounts[0]
+				accounts = accounts[1:]
+
+				log.Info("contracts left", "amt", len(accounts), "spent", gasSpent, "code len", len(account.Code))
+
 				if account.Code != nil {
 					tx = deploy(account.Code, account.Salt)
 					b.AddTx(tx)
+					log.Info("deployed aa contact", "salt", account.Salt)
+					gasSpent += tx.Gas()
 				}
 			}
 		}
+
+		// salt=0x5000000000000000000000000000000000000000000000000000000000000000
 	})
 	_, _ = blockchain.InsertChain(blocks)
 
