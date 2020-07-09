@@ -15,6 +15,7 @@ columns = [
 	"gas_price",
 	"recipient",
 	"gas",
+	"gas_used",
 	"start_time",
 	"end_time",
 	"duration",
@@ -32,6 +33,7 @@ create_table = """
 		gas_price TEXT,
 		recipient TEXT,
 		gas TEXT,
+		gas_used TEXT,
 		start_time INTEGER,
 		end_time INTEGER,
 		duration INTEGER,
@@ -78,11 +80,12 @@ insert_query = """
 		gas_price,
 		recipient,
 		gas,
+		gas_used,
 		start_time,
 		end_time,
 		duration,
 		success
-	) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 c.executemany(insert_query, ordered_columns)
