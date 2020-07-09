@@ -163,7 +163,6 @@ def main():
             init2,
             make_routine(SLEEP, duration=2),
             tx_pkg,
-            make_routine(SLEEP, duration=2),
             invalidator
     ]
 
