@@ -17,7 +17,7 @@ type Manager struct {
 }
 
 func NewManager(bc *core.BlockChain) *Manager {
-	return &Manager{chain: bc, Routines: make(chan attack.Routine, 10)}
+	return &Manager{chain: bc, Routines: make(chan attack.Routine, 100)}
 }
 
 func (pm *Manager) markBlockSent(blockNumber uint) bool {

@@ -2,3 +2,4 @@ build/*
 geth
 .eth-sim
 genesis.json
+__pycache__
