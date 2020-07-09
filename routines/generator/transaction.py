@@ -1,3 +1,5 @@
+from eth_utils import to_bytes
+from helpers import pad_left
 
 class Transaction:
     sender = ""

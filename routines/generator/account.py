@@ -1,4 +1,5 @@
 from eth_utils import to_bytes
+from helpers import create2
 
 
 class Account:
@@ -7,11 +8,11 @@ class Account:
     salt = 0
     balance = 0
 
-    def __init__(self, salt, code, balance):
+    def __init__(self, deployer, salt, code, balance):
         self.salt = "0x" + to_bytes(salt).hex().zfill(64)
         self.code = code
         self.balance = balance
-        self.addr = create2(DEPLOYER, self.salt, code)
+        self.addr = create2(deployer, self.salt, code)
 
 
     def as_obj(self):

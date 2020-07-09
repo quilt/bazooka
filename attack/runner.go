@@ -1,6 +1,8 @@
 package attack
 
-import "github.com/ethereum/go-ethereum/core"
+import (
+	"github.com/ethereum/go-ethereum/core"
+)
 
 type Runner struct {
 	routines []Routine
@@ -9,6 +11,10 @@ type Runner struct {
 
 func (r *Runner) Run() error {
 	for _, routine := range r.routines {
+		if len(r.c) == cap(r.c) {
+			panic("routine channel is full")
+		}
+
 		r.c <- routine
 	}
 

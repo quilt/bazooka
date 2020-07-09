@@ -2,7 +2,7 @@ import yaml
 from eth_utils import keccak, to_checksum_address, to_bytes
 from account import Account
 from transaction import Transaction, AATransaction
-from helpers import make_routine, make_fixture, SEND_BLOCK, SEND_TXS, SLEEP
+from helpers import create2, make_routine, make_fixture, SEND_BLOCK, SEND_TXS, SLEEP
 
 LOOPS = 12750
 
@@ -13,7 +13,7 @@ AA_CODE = "0x6055600C60003960556000F33373fffffffffffffffffffffffffffffffffffffff
 def main():
     accounts = []
     for i in range(0, 292):
-        accounts.append(Account(i, AA_CODE, 999999999))
+        accounts.append(Account(DEPLOYER, i, AA_CODE, 999999999))
 
     # make blocks to set nonce to non-zero value
     txs = []
@@ -45,6 +45,7 @@ def main():
             init2,
             make_routine(SLEEP, duration=2),
             tx_pkg,
+            make_routine(SLEEP, duration=2),
             invalidator
     ]
 
