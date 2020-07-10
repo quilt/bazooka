@@ -1,9 +1,6 @@
 #!/bin/sh
 
-
-GETH=$(pwd)/geth
-SIM=$(pwd)/.eth-sim
-
+DATADIR=.eth-sim
 
 usage() {
 	echo "usage: run.sh { build | [run ROUTINE] }"
@@ -13,25 +10,25 @@ init() {
 	echo "Cloning quilt/geth"
 	git clone -b aa-data-collection https://github.com/quilt/go-ethereum geth
 	git --git-dir geth/.git --work-tree geth cherry-pick "34566fbe5d71d689cfda691c2163e31d19142542"
-	make -C $GETH
+	make -C geth
 }
 
 build() {
-	make -C $GETH
+	make -C geth
 }
 
 run() {
-	rm -r $SIM
+	rm -rf $DATADIR
 
 	# update the shared genesis to be something convincing and pass this check:
 	# https://github.com/ethereum/go-ethereum/blob/56a319b9daa5228a6b22ecb1d07f8183ebd98106/eth/sync.go#L327
 	date=$(date +%s -d '12 hours ago')
 	sed -i 's/^  "timestamp": "[0-9]*",/  "timestamp": "'${date}'",/' genesis.json
 
-	$GETH/build/bin/geth --datadir $SIM init $(pwd)/genesis.json
+	geth/build/bin/geth --datadir $DATADIR init genesis.json
 	echo "INIT COMPLETE -- STARTING GETH"
 
-	$GETH/build/bin/geth --datadir $SIM --nodiscover --fakepow --syncmode full --verbosity 5 --networkid 1337 &
+	geth/build/bin/geth --datadir $DATADIR --nodiscover --fakepow --syncmode full --verbosity 5 --networkid 1337 &
 	P1=$!
 
 	go run main.go run $1 &
@@ -40,35 +37,27 @@ run() {
 	wait $P2
 	kill $P1
 
-	rm -r $SIM
+	rm -rf $DATADIR
+
+	echo ""
+	echo "Collecting event logs..."
+	./data-collection/db_populate.py
 
 	echo ""
 	echo "Done."
 }
 
-collect() {
-	./data-collection/db_populate.py
-}
-
-rm -r $SIM 2> /dev/null
-
-
-# check if quilt/geth already exists
-if [ ! -d $GETH ]
+if [ ! -d geth ]
 then
 	init
 fi
 
-# run script
 case $1 in 
 	"build")
 		build
 		;;
 	"run")
 		run $2
-		;;
-	"collect")
-		collect
 		;;
 	*)
 		usage
