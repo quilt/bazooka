@@ -4,7 +4,7 @@ import sqlite3
 import json
 import uuid
 
-conn = sqlite3.connect('aa-collection.db')
+conn = sqlite3.connect('events.db')
 
 columns = [
 	"id",
