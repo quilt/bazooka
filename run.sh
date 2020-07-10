@@ -43,8 +43,6 @@ run() {
 	echo "Collecting event logs..."
 	./data-collection/db_populate.py
 
-	rm -f data.json
-
 	echo ""
 	echo "Done."
 }
