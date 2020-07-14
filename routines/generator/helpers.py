@@ -24,10 +24,10 @@ def make_routine(ty, txs=[], duration=0):
         }
 
 
-def make_fixture(accounts, routines):
+def make_fixture(accounts, routines, height=100):
     f = {
             "initialization": {
-                "height": 100,
+                "height": height,
                 "accounts": {}
             },
             "routines": [
