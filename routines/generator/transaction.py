@@ -1,5 +1,6 @@
 from eth_utils import to_bytes
 from helpers import pad_left
+from constants import SEND_BLOCK, SEND_TXS, SLEEP, STOP
 
 class Transaction:
     sender = ""

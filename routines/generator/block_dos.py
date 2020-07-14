@@ -1,7 +1,7 @@
-from main import AA_CODE, BLOCK_LIMIT, DEPLOYER
 from account import Account
 from transaction import AATransaction, Transaction
 from helpers import make_fixture, make_routine, SEND_BLOCK, SEND_TXS, SLEEP
+from constants import AA_CODE, BLOCK_LIMIT, DEPLOYER
 
 BASE_GAS = 27451
 LOOP_GAS = 26
