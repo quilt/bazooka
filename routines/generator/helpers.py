@@ -1,10 +1,5 @@
 from eth_utils import keccak, to_checksum_address, to_bytes
-
-
-SEND_TXS = 0
-SEND_BLOCK = 1
-SLEEP = 2
-STOP = 3
+from constants import SEND_BLOCK, SEND_TXS, SLEEP, STOP
 
 
 def make_routine(ty, txs=[], duration=0):
@@ -24,10 +19,10 @@ def make_routine(ty, txs=[], duration=0):
         }
 
 
-def make_fixture(accounts, routines):
+def make_fixture(accounts, routines, height=100):
     f = {
             "initialization": {
-                "height": 100,
+                "height": height,
                 "accounts": {}
             },
             "routines": [

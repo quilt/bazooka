@@ -20,11 +20,20 @@ import (
 	"github.com/lightclient/bazooka/simulator/contracts"
 )
 
+type AccountWithAddress struct {
+	addr    common.Address
+	account attack.Account
+}
+
 func InitBlockchain(db ethdb.Database, height uint64, accountsMap map[common.Address]attack.Account) (*core.BlockChain, error) {
 	accounts := make([]attack.Account, 0)
+	accountsWithAddr := make([]AccountWithAddress, 0)
 
-	for _, account := range accountsMap {
+	sentBalances := false
+	deployedAa := false
+	for addr, account := range accountsMap {
 		accounts = append(accounts, account)
+		accountsWithAddr = append(accountsWithAddr, AccountWithAddress{addr: addr, account: account})
 	}
 
 	genesis, err := Genesis()
@@ -105,33 +114,48 @@ func InitBlockchain(db ethdb.Database, height uint64, accountsMap map[common.Add
 			nonce++
 			b.AddTx(tx)
 
-			// send balances
-			for addr, account := range accountsMap {
-				if account.Balance != 0 {
-					tx := transfer(addr, account.Balance)
+		}
+
+		// send balances
+		if !sentBalances && i > 0 && uint64(i) < height {
+			for len(accountsWithAddr) != 0 && gasSpent < 800000 {
+				a := accountsWithAddr[0]
+				accountsWithAddr = accountsWithAddr[1:]
+
+				if a.account.Balance != 0 {
+					tx := transfer(a.addr, a.account.Balance)
 					b.AddTx(tx)
+					gasSpent += tx.Gas()
 				}
+			}
+
+			if len(accountsWithAddr) == 0 {
+				sentBalances = true
 			}
 		}
 
 		//  initialize create2 contracts
-		if i > 1 {
+		if sentBalances && !deployedAa && i > 1 && uint64(i) < height {
 			for len(accounts) != 0 && gasSpent < 800000 {
 				account := accounts[0]
 				accounts = accounts[1:]
 
 				log.Info("contracts left", "amt", len(accounts), "spent", gasSpent, "code len", len(account.Code))
 
+				// deploy AA
 				if account.Code != nil {
 					tx = deploy(account.Code, account.Salt)
 					b.AddTx(tx)
 					log.Info("deployed aa contact", "salt", account.Salt)
 					gasSpent += tx.Gas()
+					log.Info("deployed aa contact", "gas_spent", tx.Gas(), "salt", account.Salt)
 				}
 			}
-		}
 
-		// salt=0x5000000000000000000000000000000000000000000000000000000000000000
+			if len(accounts) == 0 {
+				deployedAa = true
+			}
+		}
 	})
 	_, _ = blockchain.InsertChain(blocks)
 
