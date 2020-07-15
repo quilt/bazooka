@@ -1,6 +1,6 @@
 # bazooka
 
-[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue)](https://github.com/lightclient/fast-evm)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 A p2p load testing tool for Ethereum clients.
 
