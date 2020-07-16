@@ -1,6 +1,7 @@
 # bazooka
 
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Go Report Card](https://goreportcard.com/badge/github.com/quilt/bazooka)](https://goreportcard.com/report/github.com/quilt/bazooka)
 
 A p2p load testing tool for Ethereum clients.
 
