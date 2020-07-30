@@ -1,8 +1,27 @@
 from eth_utils import to_bytes
-from helpers import create2
+from helpers import create2, pad_left
+from random import randrange
+from web3.auto import w3
 
 
 class Account:
+    addr = ""
+    balance = ""
+    pk = ""
+
+    def __init__(self, balance):
+        acct = w3.eth.account.create(randrange(99999999999999))
+        self.addr = acct.address
+        self.pk = acct.privateKey.hex()
+        self.balance = balance
+
+    def as_obj(self):
+        return {
+            "key": self.pk,
+            "balance": self.balance
+        }
+
+class ContractAccount:
     addr = ""
     code = ""
     salt = 0

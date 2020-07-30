@@ -1,4 +1,4 @@
-from account import Account
+from account import ContractAccount
 from transaction import AATransaction, Transaction
 from helpers import make_fixture, make_routine, SEND_BLOCK, SEND_TXS, SLEEP
 from constants import AA_CODE, BLOCK_LIMIT, DEPLOYER
@@ -12,7 +12,7 @@ def make(gas_limit, block_limit=BLOCK_LIMIT):
 
     accounts = []
     for i in range(0, max_txs):
-        accounts.append(Account(DEPLOYER, i, AA_CODE, 999999999))
+        accounts.append(ContractAccount(DEPLOYER, i, AA_CODE, 999999999))
 
     # make blocks to set nonce to non-zero value
     txs = []
