@@ -96,6 +96,7 @@ func InitBlockchain(db ethdb.Database, height uint64, accountsMap map[common.Add
 
 		b.SetCoinbase(crypto.PubkeyToAddress(coinbaseKey.PublicKey))
 		b.SetExtra(common.BigToHash(big.NewInt(42)).Bytes())
+		b.SetGasLimit(12500000)
 
 		var tx *types.Transaction
 

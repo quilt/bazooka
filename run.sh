@@ -10,6 +10,8 @@ init() {
 	echo "Cloning quilt/geth"
 	git clone -b aa-data-collection https://github.com/quilt/go-ethereum geth
 	git --git-dir geth/.git --work-tree geth cherry-pick "34566fbe5d71d689cfda691c2163e31d19142542"
+	git --git-dir geth/.git --work-tree geth cherry-pick "9f0d98d6da24a0a693c3c99876f8930f74d87314"
+	git --git-dir geth/.git --work-tree geth cherry-pick "d24cda71dc4d3a9424058714e83c61f190b1e716"
 	make -C geth
 }
 
