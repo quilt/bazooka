@@ -16,6 +16,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var targetDataDir string
+
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "run an attack against a victim node",
@@ -48,7 +50,7 @@ var runCmd = &cobra.Command{
 			return
 		}
 
-		sm := simulator.NewManager(blockchain)
+		sm := simulator.NewManager(blockchain, targetDataDir)
 
 		runner, err := attack.NewRunner(blockchain, sm.GetRoutinesChannel(0))
 		if err != nil {

@@ -13,6 +13,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
+	runCmd.Flags().StringVarP(&targetDataDir, "target-data-dir", "t", "eth-sim", "geth datadir of target node")
 	rootCmd.AddCommand(runCmd)
 }
 

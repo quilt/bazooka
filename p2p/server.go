@@ -38,8 +38,8 @@ func MakeP2PServer(pm *protocol.Manager) *p2p.Server {
 	return &p2p.Server{Config: p2pConfig}
 }
 
-func AddLocalPeer(server *p2p.Server) error {
-	node, err := GetTargetAddr()
+func AddLocalPeer(server *p2p.Server, targetDataDir string) error {
+	node, err := GetTargetAddr(targetDataDir)
 	if err != nil {
 		return err
 	}
@@ -49,12 +49,12 @@ func AddLocalPeer(server *p2p.Server) error {
 	return nil
 }
 
-func GetTargetAddr() (*enode.Node, error) {
+func GetTargetAddr(targetDataDir string) (*enode.Node, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	nodekeyDir := fmt.Sprintf("%s/.eth-sim/geth/nodekey", cwd)
+	nodekeyDir := fmt.Sprintf("%s/%s/geth/nodekey", cwd, targetDataDir)
 	nodeKeyHex, err := ioutil.ReadFile(nodekeyDir)
 	if err != nil {
 		return nil, err

@@ -9,12 +9,13 @@ import (
 )
 
 type Manager struct {
-	pms     []*protocol.Manager
-	servers []*ep2p.Server
-	attack  attack.Runner
+	pms           []*protocol.Manager
+	servers       []*ep2p.Server
+	attack        attack.Runner
+	targetDataDir string
 }
 
-func NewManager(chain *core.BlockChain) Manager {
+func NewManager(chain *core.BlockChain, targetDataDir string) Manager {
 	var pms []*protocol.Manager
 
 	// eventually will support multiple attackers
@@ -23,7 +24,8 @@ func NewManager(chain *core.BlockChain) Manager {
 	}
 
 	return Manager{
-		pms: pms,
+		pms:           pms,
+		targetDataDir: targetDataDir,
 	}
 }
 
@@ -36,7 +38,7 @@ func (m *Manager) StartServers() error {
 			return err
 		}
 
-		p2p.AddLocalPeer(s)
+		p2p.AddLocalPeer(s, m.targetDataDir)
 
 		m.servers = append(m.servers, s)
 	}

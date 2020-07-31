@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DATADIR=.eth-sim
+DATADIR=.eth-sim2
 
 usage() {
 	echo "usage: run.sh { build | [run ROUTINE] }"
@@ -33,7 +33,7 @@ run() {
 	geth/build/bin/geth --datadir $DATADIR --nodiscover --fakepow --syncmode full --verbosity 5 --networkid 1337 &
 	P1=$!
 
-	go run main.go run $1 &
+	go run main.go run $1 --target-data-dir=$DATADIR &
 	P2=$!
 
 	wait $P2
