@@ -1,7 +1,8 @@
 from constants import AA_CODE, BASE_GAS_NEW, DEPLOYER, LOOP_GAS
 from account import Account, ContractAccount
 from transaction import AATransaction, Transaction
-from helpers import make_fixture, make_routine, SEND_BLOCK, SEND_TXS, SLEEP
+from helpers import make_fixture, make_routine, pad_left, SEND_BLOCK, SEND_TXS, SLEEP
+from random import randrange
 
 
 GAS_LIMIT = 400000
@@ -36,7 +37,7 @@ def make_normal(tx_count):
         a = Account(400000)
 
         # make tx signatures invalid
-        a.pk = '0x' + ('1' * 64)
+        a.pk = '0x' + pad_left(str(randrange(0, 2**160)), padder='0', chunk_size=64)
 
         accounts.append(a)
 
