@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DATADIR=.eth-sim2
+DATADIR=eth-sim
 
 usage() {
 	echo "usage: run.sh { build | [run ROUTINE] }"

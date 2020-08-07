@@ -5,11 +5,9 @@ from helpers import make_fixture, make_routine, pad_left, SEND_BLOCK, SEND_TXS, 
 from random import randrange
 
 
-GAS_LIMIT = 400000
-LOOPS = (GAS_LIMIT - BASE_GAS_NEW) // LOOP_GAS
+def make(tx_count, gl=400000):
+    loops = (gl - BASE_GAS_NEW) // LOOP_GAS
 
-
-def make(tx_count):
     accounts = []
 
     for i in range(0, tx_count):
@@ -18,7 +16,7 @@ def make(tx_count):
     # make tx package
     txs = []
     for a in accounts:
-        tx = AATransaction(a.addr, 0, LOOPS, False, 1).as_tx(GAS_LIMIT)
+        tx = AATransaction(a.addr, 0, loops, False, 1).as_tx(gl)
         txs.append(tx)
 
     tx_pkg = make_routine(SEND_TXS, list(map(lambda x: x.as_obj(), txs)))
@@ -41,11 +39,10 @@ def make_normal(tx_count):
 
         accounts.append(a)
 
-
     # make tx package
     txs = []
     for a in accounts:
-        tx = Transaction(a.addr, "0xDEADBEEF00000000000000000000000000000000", "", 0, 0, 1, 400000)
+        tx = Transaction(a.addr, "0xDEADBEEF00000000000000000000000000000000", "", 1, 0, 1, 400000)
         txs.append(tx)
 
     tx_pkg = make_routine(SEND_TXS, list(map(lambda x: x.as_obj(), txs)))
