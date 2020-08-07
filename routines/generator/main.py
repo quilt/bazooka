@@ -44,6 +44,14 @@ def main():
     save(peer_dos.make_normal(12000), os.path.join(prefix, "peer-dos-normal-12k.yaml"))
     save(peer_dos.make_normal(16000), os.path.join(prefix, "peer-dos-normal-16k.yaml"))
 
+    save(peer_dos.make_valid_normal(1000), os.path.join(prefix, "peer-dos-valid-normal-1k.yaml"))
+    save(peer_dos.make_valid_normal(2000), os.path.join(prefix, "peer-dos-valid-normal-2k.yaml"))
+    save(peer_dos.make_valid_normal(3000), os.path.join(prefix, "peer-dos-valid-normal-3k.yaml"))
+    save(peer_dos.make_valid_normal(4000), os.path.join(prefix, "peer-dos-valid-normal-4k.yaml"))
+    save(peer_dos.make_valid_normal(8000), os.path.join(prefix, "peer-dos-valid-normal-8k.yaml"))
+    save(peer_dos.make_valid_normal(12000), os.path.join(prefix, "peer-dos-valid-normal-12k.yaml"))
+    save(peer_dos.make_valid_normal(16000), os.path.join(prefix, "peer-dos-valid-normal-16k.yaml"))
+
     print("Done.")
 
 

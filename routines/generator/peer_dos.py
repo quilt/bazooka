@@ -42,7 +42,29 @@ def make_normal(tx_count):
     # make tx package
     txs = []
     for a in accounts:
-        tx = Transaction(a.addr, "0xDEADBEEF00000000000000000000000000000000", "", 1, 0, 1, 400000)
+        tx = Transaction(a.addr, "0xDEADBEEF00000000000000000000000000000000", "", 0, 0, 1, 400000)
+        txs.append(tx)
+
+    tx_pkg = make_routine(SEND_TXS, list(map(lambda x: x.as_obj(), txs)))
+
+    routines = [
+            tx_pkg,
+    ]
+
+    return make_fixture(accounts, routines, height=10000)
+
+
+def make_valid_normal(tx_count):
+    accounts = []
+
+    for _ in range(0, tx_count):
+        a = Account(400000)
+        accounts.append(a)
+
+    # make tx package
+    txs = []
+    for a in accounts:
+        tx = Transaction(a.addr, "0xDEADBEEF00000000000000000000000000000000", "", 0, 1, 1, 25000)
         txs.append(tx)
 
     tx_pkg = make_routine(SEND_TXS, list(map(lambda x: x.as_obj(), txs)))
