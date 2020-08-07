@@ -3,7 +3,7 @@ from transaction import AATransaction, Transaction
 from helpers import make_fixture, make_routine, SEND_BLOCK, SEND_TXS, SLEEP
 from constants import AA_CODE, BLOCK_LIMIT, DEPLOYER
 
-BASE_GAS = 27451
+BASE_GAS = 27470
 LOOP_GAS = 26
 
 def make(gas_limit, block_limit=BLOCK_LIMIT):
