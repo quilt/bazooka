@@ -19,6 +19,7 @@ columns = [
 	"start_time",
 	"end_time",
 	"duration",
+	"cpu_duration",
 	"success",
 ]
 
@@ -37,6 +38,7 @@ create_table = """
 		start_time INTEGER,
 		end_time INTEGER,
 		duration INTEGER,
+		cpu_duration INTEGER,
 		success BOOLEAN
 	);
 """
@@ -84,8 +86,9 @@ insert_query = """
 		start_time,
 		end_time,
 		duration,
+		cpu_duration,
 		success
-	) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 c.executemany(insert_query, ordered_columns)
