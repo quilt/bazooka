@@ -51,7 +51,7 @@ def make_normal(tx_count):
             tx_pkg,
     ]
 
-    return make_fixture(accounts, routines, height=10000)
+    return make_fixture(accounts, routines, height=10000, wait_time=60)
 
 
 def make_valid_normal(tx_count):

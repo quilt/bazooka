@@ -19,7 +19,7 @@ def make_routine(ty, txs=[], duration=0):
         }
 
 
-def make_fixture(accounts, routines, height=100):
+def make_fixture(accounts, routines, height=100, wait_time=20):
     f = {
             "initialization": {
                 "height": height,
@@ -30,7 +30,7 @@ def make_fixture(accounts, routines, height=100):
                 make_routine(SEND_BLOCK, []),
                 make_routine(SLEEP, duration=2),
                 *routines,
-                make_routine(SLEEP, duration=20),
+                make_routine(SLEEP, duration=wait_time),
                 make_routine(STOP)
             ]
     }
