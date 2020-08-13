@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DATADIR=eth-sim
 CACHE=4096
@@ -113,12 +113,12 @@ run_all() {
 
 	for i in "${cache_runs[@]}"
 	do
-		run "routines/$i"
+		run "routines/$i" || break
 	done
 
 	for i in "${nocache_runs[@]}"
 	do
-		run "routines/$i" "false"
+		run "routines/$i" "false" || break
 	done
 }
 
