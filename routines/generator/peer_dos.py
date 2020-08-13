@@ -74,3 +74,35 @@ def make_valid_normal(tx_count):
     ]
 
     return make_fixture(accounts, routines, height=10000)
+
+
+def make_multiple_normal(count, tx_count):
+    accounts = []
+
+    for _ in range(0, count * tx_count):
+        a = Account(400000)
+
+        # make tx signatures invalid
+        a.pk = '0x' + pad_left(str(randrange(0, 2**160)), padder='0', chunk_size=64)
+
+        accounts.append(a)
+
+    # make tx package
+    bundle = []
+    txs = []
+    for (i, a) in enumerate(accounts):
+        tx = Transaction(a.addr, "0xDEADBEEF00000000000000000000000000000000", "", 0, 0, 1, 400000)
+
+        if i + 1 % tx_count == tx_count:
+            bundle.append(txs)
+            txs = []
+
+        txs.append(tx)
+
+    routines = []
+
+    for b in bundle:
+        tx_pkg = make_routine(SEND_TXS, list(map(lambda x: x.as_obj(), b)))
+        routines.append(tx_pkg)
+
+    return make_fixture(accounts, routines, height=10000, wait_time=1000)
