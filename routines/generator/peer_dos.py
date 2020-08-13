@@ -25,7 +25,7 @@ def make(tx_count, gl=400000):
             tx_pkg,
     ]
 
-    return make_fixture(accounts, routines, height=10000)
+    return make_fixture(accounts, routines, height=10000, wait_time=180)
 
 
 def make_normal(tx_count):
@@ -87,17 +87,22 @@ def make_multiple_normal(count, tx_count):
 
         accounts.append(a)
 
+    print(len(accounts))
+    
     # make tx package
     bundle = []
     txs = []
     for (i, a) in enumerate(accounts):
         tx = Transaction(a.addr, "0xDEADBEEF00000000000000000000000000000000", "", 0, 0, 1, 400000)
 
-        if i + 1 % tx_count == tx_count:
+        if i != 0 and (i % tx_count) == 0:
             bundle.append(txs)
             txs = []
 
         txs.append(tx)
+
+    # capture last iteration
+    bundle.append(txs)
 
     routines = []
 
@@ -105,4 +110,6 @@ def make_multiple_normal(count, tx_count):
         tx_pkg = make_routine(SEND_TXS, list(map(lambda x: x.as_obj(), b)))
         routines.append(tx_pkg)
 
-    return make_fixture(accounts, routines, height=10000, wait_time=1000)
+    print(len(routines))
+
+    return make_fixture(accounts, routines, height=10000, wait_time=180)
