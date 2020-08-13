@@ -57,21 +57,21 @@ run() {
 
 run_all() {
 	declare -a cached_runs=(
-		"block-dos-100k"
-		"block-dos-200k"
-		"block-dos-300k"
-		"block-dos-400k"
+		"block-dos-100k.yaml"
+		"block-dos-200k.yaml"
+		"block-dos-300k.yaml"
+		"block-dos-400k.yaml"
 		"peer-dos-valid-normal-8k.yaml"
 	)
 
 	declare -a nocache_runs=(
-		"peer-dos-fast-1k"
-		"peer-dos-fast-2k"
-		"peer-dos-fast-3k"
-		"peer-dos-fast-4k"
-		"peer-dos-fast-8k"
-		"peer-dos-fast-12k"
-		"peer-dos-fast-16k"
+		"peer-dos-fast-1k.yaml"
+		"peer-dos-fast-2k.yaml"
+		"peer-dos-fast-3k.yaml"
+		"peer-dos-fast-4k.yaml"
+		"peer-dos-fast-8k.yaml"
+		"peer-dos-fast-12k.yaml"
+		"peer-dos-fast-16k.yaml"
 		"peer-dos-1k-100k.yaml"
 		"peer-dos-2k-100k.yaml"
 		"peer-dos-3k-100k.yaml"
@@ -113,12 +113,12 @@ run_all() {
 
 	for i in "${cache_runs[@]}"
 	do
-		run "routines/$i" || break
+		run "./routines/$i" || break
 	done
 
 	for i in "${nocache_runs[@]}"
 	do
-		run "routines/$i" "false" || break
+		run "./routines/$i" "false" || break
 	done
 }
 
