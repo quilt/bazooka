@@ -45,7 +45,7 @@ insert_query = """
 		otherreject,
 		underpriced,
 		ts
-	) values (?, ?, ?, ?, ?, ?, ?, ?)
+	) values (%s, %s, %s, %s, %s, %s, %s, %s)
 """
 
 create_index = """
