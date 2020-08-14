@@ -1,3 +1,4 @@
+import json
 import mysql.connector
 import os
 
@@ -30,7 +31,7 @@ create_table = """
 		duplicate INTEGER,
 		otherreject INTEGER,
 		underpriced INTEGER,
-		ts DATETIME,
+		ts DATETIME
 	);
 """
 
