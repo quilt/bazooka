@@ -114,12 +114,19 @@ run_all() {
 	for i in "${cache_runs[@]}"
 	do
 		run "./routines/$i" || break
+		echo "completed run with cache: $i"
+		sleep 5
 	done
 
 	for i in "${nocache_runs[@]}"
 	do
 		run "./routines/$i" "false" || break
+		echo "completed run no cache: $i"
+		sleep 5
 	done
+
+	echo ""
+	echo "finished run_all"
 }
 
 if [ ! -d geth ]
