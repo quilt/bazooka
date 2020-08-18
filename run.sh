@@ -111,7 +111,7 @@ run_all() {
 		"peer-dos-normal-10x16k.yaml"
 	)
 
-	for i in "${cache_runs[@]}"
+	for i in "${cached_runs[@]}"
 	do
 		run "./routines/$i" || break
 		echo "completed run with cache: $i"
