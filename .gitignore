@@ -5,3 +5,4 @@ genesis.json
 *.db
 data.json
 __pycache__
+routines/peer-dos-normal-10x10mb.yaml
