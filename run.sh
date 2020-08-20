@@ -107,9 +107,23 @@ run_all() {
 		"peer-dos-normal-8k.yaml"
 		"peer-dos-normal-12k.yaml"
 		"peer-dos-normal-16k.yaml"
+		"peer-dos-normal-32k.yaml"
 		"peer-dos-valid-normal-8k.yaml"
 		"peer-dos-normal-10x16k.yaml"
+		"peer-dos-normal-10x10mb.yaml"
 	)
+
+	wget --load-cookies /tmp/cookies.txt \
+		"https://docs.google.com/uc?export=download&confirm=$(wget \
+		--quiet \
+		--save-cookies \
+		/tmp/cookies.txt \
+		--keep-session-cookies \
+		--no-check-certificate \
+		'https://docs.google.com/uc?export=download&id=1pvepXU7p7AQ-VyQHK91-z3QtKxH_3Qrr' \
+		-O- | sed \
+		-rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1pvepXU7p7AQ-VyQHK91-z3QtKxH_3Qrr" \
+		-O ./routines/peer-dos-normal-10x10mb.yaml && rm -rf /tmp/cookies.txt
 
 	for i in "${cached_runs[@]}"
 	do
