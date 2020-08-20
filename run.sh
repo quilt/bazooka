@@ -120,9 +120,9 @@ run_all() {
 		/tmp/cookies.txt \
 		--keep-session-cookies \
 		--no-check-certificate \
-		'https://docs.google.com/uc?export=download&id=1pvepXU7p7AQ-VyQHK91-z3QtKxH_3Qrr' \
+		'https://docs.google.com/uc?export=download&id=1SwR06yLve4Y2G0X21INh5-gwTV0fpVZC' \
 		-O- | sed \
-		-rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1pvepXU7p7AQ-VyQHK91-z3QtKxH_3Qrr" \
+		-rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1SwR06yLve4Y2G0X21INh5-gwTV0fpVZC" \
 		-O ./routines/peer-dos-normal-10x10mb.yaml && rm -rf /tmp/cookies.txt
 
 	for i in "${cached_runs[@]}"
