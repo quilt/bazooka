@@ -50,6 +50,8 @@ var runCmd = &cobra.Command{
 			return
 		}
 
+		log.Info("chain initialized")
+
 		sm := simulator.NewManager(blockchain, targetDataDir)
 
 		runner, err := attack.NewRunner(blockchain, sm.GetRoutinesChannel(0))

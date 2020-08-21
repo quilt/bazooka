@@ -12,6 +12,8 @@ import (
 )
 
 func (a *Attack) SignAndAssemble(bc *core.BlockChain) error {
+	log.Info("Signing and assembling txs")
+
 	// for now, assume the blocks will only be defined in a contiguous manner
 	blockHeight := bc.CurrentHeader().Number.Uint64() + 1
 
