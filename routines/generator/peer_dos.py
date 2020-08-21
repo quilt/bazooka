@@ -58,7 +58,7 @@ def make_valid_normal(tx_count):
     accounts = []
 
     for _ in range(0, tx_count):
-        a = Account(400000)
+        a = Account(0)
         accounts.append(a)
 
     # make tx package

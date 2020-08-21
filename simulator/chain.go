@@ -141,8 +141,6 @@ func InitBlockchain(db ethdb.Database, height uint64, accountsMap map[common.Add
 				account := accounts[0]
 				accounts = accounts[1:]
 
-				log.Info("contracts left", "amt", len(accounts), "spent", gasSpent, "code len", len(account.Code))
-
 				// deploy AA
 				if account.Code != nil {
 					tx = deploy(account.Code, account.Salt)
